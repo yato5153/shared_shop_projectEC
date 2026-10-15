@@ -151,13 +151,17 @@ header .container{
 	background: #edf9fe;
 }
 .navi_menu {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	width: 960px;
 	padding:12px 0;
 	margin: 0 auto;
 }
+
 .navi_menu li {
 	display: inline-block;
-	width: 24%;
+	width: 20%;
 	margin-right: 4px;
 }
 .navi_menu a {
