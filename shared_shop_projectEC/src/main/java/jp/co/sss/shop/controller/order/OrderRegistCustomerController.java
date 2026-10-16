@@ -1,8 +1,6 @@
 
 package jp.co.sss.shop.controller.order;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +21,7 @@ import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.BasketBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.Coupon;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
@@ -31,6 +30,7 @@ import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.AddressForm;
 import jp.co.sss.shop.form.BasketForm;
 import jp.co.sss.shop.form.OrderForm;
+import jp.co.sss.shop.repository.CouponsRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
@@ -59,6 +59,9 @@ public class OrderRegistCustomerController {
 
     @Autowired
     UserCouponsRepository userCouponsRepository;
+    
+    @Autowired
+    CouponsRepository couponsRepository;
 
     @Autowired
     HttpSession session;
@@ -91,57 +94,47 @@ public class OrderRegistCustomerController {
             return;
         }
 
-        Date today = Date.valueOf(LocalDate.now());
-
         List<UserCoupon> coupons =
-                userCouponsRepository
-                .findByUser_IdAndIsUsedAndCoupon_ExpirationDateGreaterThanEqual(
-                        userId, 0, today);
+                userCouponsRepository.findByUser_IdAndControl(userId, 0);
 
         model.addAttribute("availableCoupons", coupons);
     }
 
-    /**
-     * 選択クーポンの使用可否を確認
-     */
-    private Optional<UserCoupon> findValidCoupon(
-            Integer userCouponId,
-            Integer userId,
-            int subtotal) {
 
-        if (userCouponId == null || userId == null) {
-            return Optional.empty();
-        }
+/**
+ * 選択クーポンの使用可否を確認
+ */
 
-        Optional<UserCoupon> result =
-                userCouponsRepository
-                .findByIdAndUser_IdAndIsUsed(
-                        userCouponId, userId, 0);
+private Optional<UserCoupon> findValidCoupon(
+        Integer userCouponId,
+        Integer userId,
+        int subtotal) {
 
-        if (result.isEmpty()) {
-            return Optional.empty();
-        }
-
-        UserCoupon userCoupon = result.get();
-
-        Date today = Date.valueOf(LocalDate.now());
-
-        if (userCoupon.getCoupon().getExpirationDate()
-                .before(today)) {
-            return Optional.empty();
-        }
-
-        Integer discount =
-                userCoupon.getCoupon().getDiscountAmount();
-
-        if (discount == null
-                || discount <= 0
-                || discount > subtotal) {
-            return Optional.empty();
-        }
-
-        return Optional.of(userCoupon);
+    if (userCouponId == null || userId == null || subtotal <= 0) {
+        return Optional.empty();
     }
+
+    Optional<UserCoupon> result =
+            userCouponsRepository.findByIdAndUser_IdAndControl(
+                    userCouponId, userId, 0);
+
+    if (result.isEmpty()) {
+        return Optional.empty();
+    }
+
+    UserCoupon userCoupon = result.get();
+
+    java.math.BigDecimal discountRate =
+            userCoupon.getCoupon().getDiscountRate();
+
+    if (discountRate == null
+            || discountRate.compareTo(java.math.BigDecimal.ZERO) <= 0
+            || discountRate.compareTo(new java.math.BigDecimal("100")) > 0) {
+        return Optional.empty();
+    }
+
+    return Optional.of(userCoupon);
+}
 
     /**
      * お届け先入力処理
@@ -401,12 +394,15 @@ public class OrderRegistCustomerController {
 
             UserCoupon userCoupon = selectedCoupon.get();
 
-            discountAmount =
-                    userCoupon.getCoupon()
-                    .getDiscountAmount();
 
-            couponName =
-                    userCoupon.getCoupon().getName();
+discountAmount = java.math.BigDecimal.valueOf(subtotal)
+        .multiply(userCoupon.getCoupon().getDiscountRate())
+        .divide(new java.math.BigDecimal("100"))
+        .setScale(0, java.math.RoundingMode.DOWN)
+        .intValue();
+
+couponName = userCoupon.getCoupon().getCouponsName();
+
         }
 
         int total = subtotal - discountAmount;
@@ -537,9 +533,13 @@ public class OrderRegistCustomerController {
 
             selectedUserCoupon = couponResult.get();
 
-            discountAmount =
-                    selectedUserCoupon.getCoupon()
-                    .getDiscountAmount();
+
+discountAmount = java.math.BigDecimal.valueOf(subtotal)
+        .multiply(selectedUserCoupon.getCoupon().getDiscountRate())
+        .divide(new java.math.BigDecimal("100"))
+        .setScale(0, java.math.RoundingMode.DOWN)
+        .intValue();
+
         }
 
         // 在庫数を更新
@@ -592,12 +592,30 @@ public class OrderRegistCustomerController {
         // クーポンを使用済みに変更
         if (selectedUserCoupon != null) {
 
-            selectedUserCoupon.setIsUsed(1);
+        	selectedUserCoupon.setControl(1);
             selectedUserCoupon.setOrder(order);
 
             userCouponsRepository.save(
                     selectedUserCoupon);
         }
+        
+
+        // 商品合計5,000円以上で20%クーポンを付与
+        if (subtotal >= 5000) {
+
+            Coupon repeatCoupon = couponsRepository.findById(7)
+                    .orElseThrow(() ->
+                            new IllegalStateException(
+                                    "リピート会員クーポンが見つかりません。"));
+
+            UserCoupon newUserCoupon = new UserCoupon();
+            newUserCoupon.setUser(user);
+            newUserCoupon.setCoupon(repeatCoupon);
+            newUserCoupon.setControl(0);
+
+            userCouponsRepository.save(newUserCoupon);
+        }
+
 
         // 注文完了後に買い物かごを初期化
         session.removeAttribute("basketBeans");
