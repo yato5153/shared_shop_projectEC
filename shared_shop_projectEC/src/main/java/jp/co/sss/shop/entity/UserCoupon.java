@@ -1,3 +1,4 @@
+
 package jp.co.sss.shop.entity;
 
 import jakarta.persistence.Column;
@@ -44,14 +45,14 @@ public class UserCoupon {
      * クーポン情報
      */
     @ManyToOne
-    @JoinColumn(name = "coupon_id", nullable = false)
+    @JoinColumn(name = "coupons_id", nullable = false)
     private Coupon coupon;
 
     /**
      * 使用状況（0：未使用、1：使用済み）
      */
-    @Column(name = "is_used", nullable = false)
-    private Integer isUsed = 0;
+    @Column(name = "control", nullable = false)
+    private Integer control = 0;
 
     /**
      * クーポンを使用した注文
@@ -84,12 +85,12 @@ public class UserCoupon {
         this.coupon = coupon;
     }
 
-    public Integer getIsUsed() {
-        return isUsed;
+    public Integer getControl() {
+        return control;
     }
 
-    public void setIsUsed(Integer isUsed) {
-        this.isUsed = isUsed;
+    public void setControl(Integer control) {
+        this.control = control;
     }
 
     public Order getOrder() {

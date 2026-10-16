@@ -156,7 +156,7 @@ public class UserRegistCustomerController {
 
         userCoupon.setUser(savedUser);
         userCoupon.setCoupon(coupon);
-        userCoupon.setIsUsed(0);
+        userCoupon.setControl(0);
 
         // クーポンを会員に付与
         userCouponsRepository.save(userCoupon);

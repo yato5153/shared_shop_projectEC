@@ -1,6 +1,7 @@
+
 package jp.co.sss.shop.entity;
 
-import java.sql.Date;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,14 +30,11 @@ public class Coupon {
     )
     private Integer id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "coupons_name", nullable = false, length = 256)
+    private String couponsName;
 
-    @Column(nullable = false)
-    private Integer discountAmount;
-
-    @Column(nullable = false)
-    private Date expirationDate;
+    @Column(name = "discount_rate", nullable = false, precision = 5, scale = 2)
+    private BigDecimal discountRate;
 
     public Integer getId() {
         return id;
@@ -46,27 +44,19 @@ public class Coupon {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCouponsName() {
+        return couponsName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCouponsName(String couponsName) {
+        this.couponsName = couponsName;
     }
 
-    public Integer getDiscountAmount() {
-        return discountAmount;
+    public BigDecimal getDiscountRate() {
+        return discountRate;
     }
 
-    public void setDiscountAmount(Integer discountAmount) {
-        this.discountAmount = discountAmount;
-    }
-
-    public Date getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
+    public void setDiscountRate(BigDecimal discountRate) {
+        this.discountRate = discountRate;
     }
 }
