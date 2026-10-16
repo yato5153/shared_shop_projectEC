@@ -312,6 +312,16 @@ private Optional<UserCoupon> findValidCoupon(
 
         // 在庫数の確認
         for (BasketBean basketBean : basketBeanList) {
+        	
+        	if (basketBean.getOrderNum() == null
+        	        || basketBean.getOrderNum() <= 0) {
+
+        	    model.addAttribute(
+        	            "quantityError",
+        	            "注文数量は1以上を指定してください。");
+
+        	    return inputPaymentBack(model, form);
+        	}
 
             Item itemStockLessThanOrderNum =
                     itemRepository.findByIdAndStockLessThan(
@@ -492,7 +502,9 @@ couponName = userCoupon.getCoupon().getCouponsName();
             Item item = itemRepository
                     .getById(basketBean.getId());
 
-            if (item.getStock() < basketBean.getOrderNum()) {
+            if (basketBean.getOrderNum() == null
+                    || basketBean.getOrderNum() <= 0
+                    || item.getStock() < basketBean.getOrderNum()) {
                 errorItem = item;
                 break;
             }
@@ -515,11 +527,24 @@ couponName = userCoupon.getCoupon().getCouponsName();
         // クーポンの再確認
         if (form.getUserCouponId() != null) {
 
-            Optional<UserCoupon> couponResult =
-                    findValidCoupon(
-                            form.getUserCouponId(),
-                            userId,
-                            subtotal);
+        	Optional<UserCoupon> couponResult =
+        	        userCouponsRepository.findUnusedCouponForUpdate(
+        	                form.getUserCouponId(),
+        	                userId);
+
+        	if (couponResult.isPresent()) {
+        	    UserCoupon coupon = couponResult.get();
+
+        	    java.math.BigDecimal rate =
+        	            coupon.getCoupon().getDiscountRate();
+
+        	    if (subtotal <= 0
+        	            || rate == null
+        	            || rate.compareTo(java.math.BigDecimal.ZERO) <= 0
+        	            || rate.compareTo(new java.math.BigDecimal("100")) > 0) {
+        	        couponResult = Optional.empty();
+        	    }
+        	}
 
             if (couponResult.isEmpty()) {
 
