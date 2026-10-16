@@ -527,24 +527,11 @@ couponName = userCoupon.getCoupon().getCouponsName();
         // クーポンの再確認
         if (form.getUserCouponId() != null) {
 
-        	Optional<UserCoupon> couponResult =
-        	        userCouponsRepository.findUnusedCouponForUpdate(
-        	                form.getUserCouponId(),
-        	                userId);
-
-        	if (couponResult.isPresent()) {
-        	    UserCoupon coupon = couponResult.get();
-
-        	    java.math.BigDecimal rate =
-        	            coupon.getCoupon().getDiscountRate();
-
-        	    if (subtotal <= 0
-        	            || rate == null
-        	            || rate.compareTo(java.math.BigDecimal.ZERO) <= 0
-        	            || rate.compareTo(new java.math.BigDecimal("100")) > 0) {
-        	        couponResult = Optional.empty();
-        	    }
-        	}
+            Optional<UserCoupon> couponResult =
+                    findValidCoupon(
+                            form.getUserCouponId(),
+                            userId,
+                            subtotal);
 
             if (couponResult.isEmpty()) {
 
