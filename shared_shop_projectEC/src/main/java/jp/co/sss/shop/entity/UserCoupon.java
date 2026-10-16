@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -41,13 +40,6 @@ public class UserCoupon {
 	 * クーポン使用判定
 	 */
 	private Integer status;
-	
-    /**
-     * クーポンを使用した注文
-     */
-    @OneToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
 
 	/**
 	 * getterとsetter
@@ -82,14 +74,6 @@ public class UserCoupon {
 
 	public void setStatus(Integer status) {
 		this.status = status;
-	}
-
-	public Order getOrder() {
-		return order;
-	}
-
-	public void setOrder(Order order) {
-		this.order = order;
 	}
 
 

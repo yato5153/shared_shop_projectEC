@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.constraints.AssertFalse.List;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.repository.UserCouponsRepository;
 
@@ -31,8 +32,9 @@ public class CouponShowController {
 		Object user = session.getAttribute("user");
 		Integer userId = ((UserBean) user).getId();
 		
-		model.addAttribute("couponList", userCouponsRepository.findByUser_Id(userId));
-
+		List canUseCoupons = (List) userCouponsRepository.findByUser_IAndStatus(userId, 0);
+		model.addAttribute("canUseCoupons", canUseCoupons);
+		
 		return "coupon/show";
 	}
 }
