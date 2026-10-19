@@ -18,13 +18,7 @@ public interface UserCouponsRepository extends JpaRepository<UserCoupon, Integer
     List<UserCoupon> findByUser_Id(Integer userId);
     
     // 一般会員が所持しているクーポンの中から使用可能なものを取得
-    List<UserCoupon> findByUser_IAndStatus(Integer userId, Integer status);
-
-    // 指定会員の未使用クーポンを取得
-    List<UserCoupon> findByUser_IdAndStatus(
-            Integer userId,
-            Integer status
-    );
+    List<UserCoupon> findByUser_IdAndStatus(Integer userId, Integer status);
 
     // 指定会員が保有する未使用クーポンを1件取得
     Optional<UserCoupon> findByIdAndUser_IdAndStatus(

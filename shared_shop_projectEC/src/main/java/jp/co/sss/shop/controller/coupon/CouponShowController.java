@@ -2,6 +2,9 @@
 
 package jp.co.sss.shop.controller.coupon;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,8 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.constraints.AssertFalse.List;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.Coupon;
+import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.repository.UserCouponsRepository;
 
 @Controller
@@ -32,9 +36,27 @@ public class CouponShowController {
 		Object user = session.getAttribute("user");
 		Integer userId = ((UserBean) user).getId();
 		
-		List canUseCoupons = (List) userCouponsRepository.findByUser_IAndStatus(userId, 0);
-		model.addAttribute("canUseCoupons", canUseCoupons);
+		List<UserCoupon> userCoupons = userCouponsRepository.findByUser_Id(userId);
 		
+		List<String> couponNames = new ArrayList<>();
+		
+		for (UserCoupon userCoupon : userCoupons) {
+			if (userCoupon.getStatus() == 0) {
+				Coupon coupon = userCoupon.getCoupon();
+				couponNames.add(coupon.getCouponsName());
+			}
+		}
+		
+		boolean couponFalse = couponNames.isEmpty();
+		
+		model.addAttribute("couponNames", couponNames);
+		model.addAttribute("couponFalse", couponFalse);
+		
+		//デバッグ用、有効にするとクーポン一覧画面に表示される
+		//model.addAttribute("debugUserId", userId);
+		//model.addAttribute("debugCouponCount", couponNames.size());
+		//model.addAttribute("debugcouponNames", couponNames);
+
 		return "coupon/show";
 	}
 }

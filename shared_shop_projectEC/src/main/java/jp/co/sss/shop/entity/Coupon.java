@@ -32,13 +32,13 @@ public class Coupon {
      * クーポン名
      */
     @Column(nullable = false)
-    private String name;
+    private String couponsName;
 
     /**
      * クーポン割引率
      */
     @Column(nullable = false)
-    private Integer discountAmount;
+    private Integer discountRate;
 
     /**
      * getterとsetter
@@ -51,20 +51,20 @@ public class Coupon {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCouponsName() {
+        return couponsName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCouponsName(String couponsName) {
+        this.couponsName = couponsName;
     }
 
-    public Integer getDiscountAmount() {
-        return discountAmount;
-    }
+	public Integer getDiscountRate() {
+		return discountRate;
+	}
 
-    public void setDiscountAmount(Integer discountAmount) {
-        this.discountAmount = discountAmount;
-    }
+	public void setDiscountRate(Integer discountRate) {
+		this.discountRate = discountRate;
+	}
 
 }
