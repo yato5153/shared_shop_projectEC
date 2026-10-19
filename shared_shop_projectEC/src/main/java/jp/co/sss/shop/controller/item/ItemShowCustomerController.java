@@ -38,11 +38,14 @@ public class ItemShowCustomerController {
 	 */
 	@RequestMapping(path = "/")
 	public String index(Model model) {
-		// 商品の並び順情報（2：売れ筋順）
-		int sortType = 2;
+		// 商品の並び順情報（2：売れ筋順）(1:新着順）
+		int sortType = 1;
 
-		// 商品情報を全件検索(売れ筋順)
-		List<Item> itemList = itemRepository.findAllOrderById();
+//		// 商品情報を全件検索(売れ筋順)
+//		List<Item> itemList = itemRepository.findAllOrderById();
+		
+        // 商品情報を全件検索(新着順)
+		List<Item> itemList = itemRepository.findByDeleteFlagOrderByInsertDateDescIdAsc(Constant.NOT_DELETED);
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = BeanCopy.copyEntityToItemBean(itemList);
