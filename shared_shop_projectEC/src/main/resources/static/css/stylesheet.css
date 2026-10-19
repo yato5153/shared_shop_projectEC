@@ -679,3 +679,15 @@ p.link_center {
 .order_detail .price_value {
     text-align: right;
 }
+
+/* ---- クーポン一覧 ---- */
+.user_coupon_display {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.user_coupon_display img {
+	width: 60%;
+}

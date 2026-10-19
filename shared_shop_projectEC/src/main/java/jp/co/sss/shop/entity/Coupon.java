@@ -1,4 +1,3 @@
-
 package jp.co.sss.shop.entity;
 
 import java.math.BigDecimal;
@@ -28,14 +27,23 @@ public class Coupon {
         sequenceName = "seq_coupons",
         allocationSize = 1
     )
+
     private Integer id;
 
+    /**
+     * クーポン名
+     */
     @Column(name = "coupons_name", nullable = false, length = 256)
     private String couponsName;
-
+    /**
+     * クーポン割引率
+     */
     @Column(name = "discount_rate", nullable = false, precision = 5, scale = 2)
     private BigDecimal discountRate;
 
+    /**
+     * getterとsetter
+     */
     public Integer getId() {
         return id;
     }
@@ -59,4 +67,5 @@ public class Coupon {
     public void setDiscountRate(BigDecimal discountRate) {
         this.discountRate = discountRate;
     }
+
 }
