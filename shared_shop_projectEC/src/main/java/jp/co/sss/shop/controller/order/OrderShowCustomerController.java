@@ -178,7 +178,7 @@ public class OrderShowCustomerController {
 
         if (userCoupon.isPresent()) {
             couponName =
-                    userCoupon.get().getCoupon().getName();
+                    userCoupon.get().getCoupon().getCouponsName();
         }
 
         // HTMLへ渡す情報
