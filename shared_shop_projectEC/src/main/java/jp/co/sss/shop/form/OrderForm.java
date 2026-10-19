@@ -1,10 +1,9 @@
+
 package jp.co.sss.shop.form;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
-
 
 /**
  * 注文情報入力フォーム
@@ -13,117 +12,131 @@ import jakarta.validation.constraints.Size;
  */
 public class OrderForm {
 
-	/**
-	 * 注文ID
-	 */
-	private Integer id;
+    /**
+     * 注文ID
+     */
+    private Integer id;
 
-	/**
-	 * 送付先郵便番号
-	 */
-	@NotBlank
-	@Size(min = 7, max = 7, message = "郵便番号は7文字で入力してください。")
-	@Pattern(regexp = "^[0-9]+$")
-	private String postalCode;
+    /**
+     * 送付先郵便番号
+     */
+    @NotBlank
+    @Size(min = 7, max = 7, message = "郵便番号は7文字で入力してください。")
+    @Pattern(regexp = "^[0-9]+$")
+    private String postalCode;
 
-	/**
-	 * 送付先住所
-	 */
-	@NotBlank
-	@Size(min = 1, max = 150)
-	private String address;
+    /**
+     * 送付先住所
+     */
+    @NotBlank
+    @Size(min = 1, max = 150)
+    private String address;
 
-	/**
-	 * 送付先氏名
-	 */
-	@NotBlank
-	@Size(min = 1, max = 30)
-	private String name;
+    /**
+     * 送付先氏名
+     */
+    @NotBlank
+    @Size(min = 1, max = 30)
+    private String name;
 
-	/**
-	 * 送付先電話番号
-	 */
-	@NotBlank
-	@Size(min = 10, max = 11)
-	@Pattern(regexp = "^[0-9]+$")
-	private String phoneNumber;
+    /**
+     * 送付先電話番号
+     */
+    @NotBlank
+    @Size(min = 10, max = 11)
+    @Pattern(regexp = "^[0-9]+$")
+    private String phoneNumber;
 
-	/**
-	 * 支払い方法
-	 */
-	private Integer payMethod;
+    /**
+     * 支払い方法
+     */
+    private Integer payMethod;
 
-	/**
-	 * 会員ID
-	 */
-	private Integer userId;
+    /**
+     * 会員ID
+     */
+    private Integer userId;
 
-	/**
-	 * 注文時点合計金額
-	 */
-	private Integer price;
+    /**
+     * 注文時点合計金額
+     */
+    private Integer price;
 
-	public Integer getId() {
-		return id;
-	}
+    /**
+     * 選択した会員保有クーポンID
+     * nullの場合はクーポンを使用しない
+     */
+    private Integer userCouponId;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public String getPostalCode() {
-		return postalCode;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setPostalCode(String postalCode) {
-		this.postalCode = postalCode;
-	}
+    public String getPostalCode() {
+        return postalCode;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public Integer getPayMethod() {
-		return payMethod;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	public void setPayMethod(Integer payMethod) {
-		this.payMethod = payMethod;
-	}
+    public Integer getPayMethod() {
+        return payMethod;
+    }
 
-	public Integer getUserId() {
-		return userId;
-	}
+    public void setPayMethod(Integer payMethod) {
+        this.payMethod = payMethod;
+    }
 
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
+    public Integer getUserId() {
+        return userId;
+    }
 
-	public Integer getPrice() {
-		return price;
-	}
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
-	public void setPrice(Integer price) {
-		this.price = price;
-	}
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public Integer getUserCouponId() {
+        return userCouponId;
+    }
+
+    public void setUserCouponId(Integer userCouponId) {
+        this.userCouponId = userCouponId;
+    }
 }
