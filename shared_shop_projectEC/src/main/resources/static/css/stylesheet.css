@@ -654,6 +654,32 @@ p.link_center {
 	margin-top: 10px;
 }
 
+/* ---- 注文詳細：クーポン表示 ---- */
+
+/* クーポン名 */
+.order_detail .coupon_name {
+    color: #12526d;
+    font-weight: bold;
+}
+
+/* クーポン割引金額 */
+.order_detail .coupon_discount {
+    color: #d22222;
+    font-weight: bold;
+}
+
+/* クーポン適用後の合計金額 */
+.order_detail .discounted_total {
+    color: #12526d;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* 金額表示 */
+.order_detail .price_value {
+    text-align: right;
+}
+
 /* ---- クーポン一覧 ---- */
 .user_coupon_display {
 	display: flex;

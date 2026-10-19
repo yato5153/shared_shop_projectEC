@@ -1,5 +1,7 @@
 package jp.co.sss.shop.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,14 +33,13 @@ public class Coupon {
     /**
      * クーポン名
      */
-    @Column(nullable = false)
+    @Column(name = "coupons_name", nullable = false, length = 256)
     private String couponsName;
-
     /**
      * クーポン割引率
      */
-    @Column(nullable = false)
-    private Integer discountRate;
+    @Column(name = "discount_rate", nullable = false, precision = 5, scale = 2)
+    private BigDecimal discountRate;
 
     /**
      * getterとsetter
@@ -59,12 +60,12 @@ public class Coupon {
         this.couponsName = couponsName;
     }
 
-	public Integer getDiscountRate() {
-		return discountRate;
-	}
+    public BigDecimal getDiscountRate() {
+        return discountRate;
+    }
 
-	public void setDiscountRate(Integer discountRate) {
-		this.discountRate = discountRate;
-	}
+    public void setDiscountRate(BigDecimal discountRate) {
+        this.discountRate = discountRate;
+    }
 
 }

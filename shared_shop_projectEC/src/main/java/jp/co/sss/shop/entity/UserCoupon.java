@@ -40,6 +40,13 @@ public class UserCoupon {
 	 * クーポン使用判定
 	 */
 	private Integer status;
+	
+	/**
+	 * クーポンを使用した注文（これはテーブルにないから作るとエラーになるのでは・gettersetterは未作成）
+	 */
+    //@OneToOne
+    //@JoinColumn(name = "order_id")
+    //private Order order;
 
 	/**
 	 * getterとsetter
