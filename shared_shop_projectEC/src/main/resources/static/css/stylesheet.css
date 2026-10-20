@@ -679,3 +679,28 @@ p.link_center {
 .order_detail .price_value {
     text-align: right;
 }
+
+/* クーポン選択欄 */
+.coupon_select_area {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* クーポン選択欄の見出し */
+.coupon_select_area h3 {
+    margin-bottom: 10px;
+}
+
+/* クーポン選択肢 */
+.coupon_select_area .radio_label {
+    display: inline-block;
+    margin: 8px 0;
+    cursor: pointer;
+}
+
+/* クーポン未所持時のメッセージ */
+.coupon_select_area p {
+    margin: 5px 0 10px;
+}
