@@ -9,10 +9,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Coupon;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.UserCoupon;
@@ -24,156 +25,83 @@ import jp.co.sss.shop.repository.UserRepository;
 @Controller
 public class UserRegistCustomerController {
 
-    // 新規会員登録特典クーポンのID
+
+	// 新規会員登録特典クーポンのID
     private static final int NEW_USER_COUPON_ID = 1;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
     private CouponsRepository couponsRepository;
-
-    @Autowired
+	
+	@Autowired
     private UserCouponsRepository userCouponsRepository;
+	
+	@Autowired
+	HttpSession session;
 
-    @Autowired
-    private HttpSession session;
+	@RequestMapping(path = "/user/regist/input")
+	public String showInputUser(@ModelAttribute("userForm") UserForm userForm, Model model) {
+		model.addAttribute("userForm", userForm);
+		return "user/regist/regist_input";
+	}
 
-    // 会員登録入力画面
-    @RequestMapping(
-        path = "/client/user/regist/input",
-        method = RequestMethod.GET
-    )
-    public String registInput(Model model) {
+	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
+	public String regitCheckUser(@Valid @ModelAttribute("userForm") UserForm userForm, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+		// 入力値にエラーがあった場合、会員情報 入力画面表示処理に戻る
+		if (result.hasErrors()) {
+			
+			return "user/regist/regist_input";
+		}
+		
+		return "user/regist/regist_check";
+	}
+	
+	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
+	public String registComplete(@ModelAttribute UserForm form, HttpSession session) {
+		// 会員情報の生成
+		User user = new User();
+		user.setAuthority(2);
 
-        UserForm userForm =
-            (UserForm) session.getAttribute("registUserForm");
+		// 入力値を会員情報にコピー
+		BeanUtils.copyProperties(form, user);
 
-        if (userForm == null) {
-            userForm = new UserForm();
-        }
-
-        model.addAttribute("userForm", userForm);
-
-        return "user/regist/regist_input";
-    }
-
-    // 確認画面から入力画面に戻る
-    @RequestMapping(
-        path = "/client/user/regist/input",
-        method = RequestMethod.POST
-    )
-    public String registInputBack(Model model) {
-
-        UserForm userForm =
-            (UserForm) session.getAttribute("registUserForm");
-
-        if (userForm == null) {
-            return "redirect:/client/user/regist/input";
-        }
-
-        model.addAttribute("userForm", userForm);
-
-        return "user/regist/regist_input";
-    }
-
-    // 会員登録確認画面
-    @RequestMapping(
-        path = "/client/user/regist/check",
-        method = RequestMethod.POST
-    )
-    public String registCheck(
-            @Valid @ModelAttribute("userForm") UserForm form,
-            BindingResult result) {
-
-        if (result.hasErrors()) {
-            return "user/regist/regist_input";
-        }
-
-        // メールアドレスの重複確認
-        if (userRepository.findByEmail(form.getEmail()) != null) {
-            result.rejectValue(
-                "email",
-                "email.duplicate",
-                "このメールアドレスは既に登録されています。"
-            );
-
-            return "user/regist/regist_input";
-        }
-
-        // 一般会員の権限を設定
-        form.setAuthority(2);
-
-        // 登録内容をセッションに保存
-        session.setAttribute("registUserForm", form);
-
-        return "user/regist/regist_check";
-    }
-
-    // 会員登録確定処理
-    @Transactional
-    @RequestMapping(
-        path = "/client/user/regist/complete",
-        method = RequestMethod.POST
-    )
-    public String registComplete() {
-
-        UserForm form =
-            (UserForm) session.getAttribute("registUserForm");
-
-        if (form == null) {
-            return "redirect:/client/user/regist/input";
-        }
-
-        // 登録確定時にも重複を確認
-        if (userRepository.findByEmail(form.getEmail()) != null) {
-            return "redirect:/client/user/regist/input";
-        }
-
-        // 会員情報を作成
-        User user = new User();
-
-        BeanUtils.copyProperties(form, user);
-
-        // 一般会員として登録
-        user.setId(null);
-        user.setAuthority(2);
-
-        // 会員情報を保存
-        User savedUser = userRepository.save(user);
-
-        // 新規登録特典クーポンを取得
-        Coupon coupon = couponsRepository
-                .findById(NEW_USER_COUPON_ID)
-                .orElseThrow(() ->
-                    new IllegalStateException(
-                        "新規会員登録特典クーポンが存在しません。"
-                    )
-                );
-
-        // クーポン付与情報を作成
+		// 会員情報を保存
+		userRepository.save(user);
+		
+		//ログイン情報をセッションに保存
+		UserBean userBean = new UserBean();
+		BeanUtils.copyProperties(user, userBean);
+		session.setAttribute("user", userBean);
+		
+		// クーポン付与情報を作成
         UserCoupon userCoupon = new UserCoupon();
-
-        userCoupon.setUser(savedUser);
+        // 新規登録特典クーポンを取得
+        Coupon coupon = couponsRepository.findById(NEW_USER_COUPON_ID).orElseThrow(() ->
+        	new IllegalStateException("新規会員登録特典クーポンが存在しません。"));
+		
+		userCoupon.setUser(user);
         userCoupon.setCoupon(coupon);
-        userCoupon.setControl(0);
+        userCoupon.setStatus(0);
 
         // クーポンを会員に付与
         userCouponsRepository.save(userCoupon);
 
-        // 登録情報をセッションから削除
-        session.removeAttribute("registUserForm");
+		return "redirect:/user/regist/complete";
+	}
 
-        return "redirect:/client/user/regist/complete";
-    }
+	/**
+	 * 会員情報登録完了画面表示
+	 *
+	 * @param form 会員情報
+	 * @return "user/regist/user_regist_complete_admin" 会員情報 登録完了画面へ
+	 */
+	@RequestMapping(path = "/user/regist/complete", method = RequestMethod.GET)
+	public String registCompleteRedirect() {
+		
+		return "user/regist/regist_complete";
+	}
 
-    // 登録完了画面
-    @RequestMapping(
-        path = "/client/user/regist/complete",
-        method = RequestMethod.GET
-    )
-    public String registCompleteView() {
-
-        return "user/regist/regist_complete";
-    }
 }

@@ -5,13 +5,15 @@
 <head>
 	<title>会員詳細 | シェアードショップ </title>
 	<meta charset="UTF-8" />
+	
 </head>
 
 <body class="user user_detail">
+	
 	<h2 th:class="title">会員詳細</h2>
 
 	<div class="info_form_area">
-		<div class="detail_area">
+		<div class="user_detail_area">
 			<ul class="input_list">
 				<li>
 					<span class="input_title">メールアドレス</span>
@@ -49,9 +51,11 @@
 				<input type="submit" value="戻る" class="back_button" />
 			</form>
 			<form th:action="@{/client/user/update/input}" method="post">
+				<input type="hidden" name="id" th:value="${user.id}" />
 				<input type="submit" value="変更" />
 			</form>
 			<form th:action="@{/client/user/delete/check}" method="post">
+				<input type="hidden" name="id" th:value="${user.id}" />
 				<input type="submit" value="退会" class="delete" />
 			</form>
 		</div>
