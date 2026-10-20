@@ -38,14 +38,11 @@ public class ItemShowCustomerController {
 	 */
 	@RequestMapping(path = "/")
 	public String index(Model model) {
-		// 商品の並び順情報（2：売れ筋順）(1:新着順）
-		int sortType = 1;
+		// 商品の並び順情報（2：売れ筋順）
+		int sortType = 2;
 
-//		// 商品情報を全件検索(売れ筋順)
-//		List<Item> itemList = itemRepository.findAllOrderById();
-		
-        // 商品情報を全件検索(新着順)
-		List<Item> itemList = itemRepository.findByDeleteFlagOrderByInsertDateDescIdAsc(Constant.NOT_DELETED);
+		// 商品情報を全件検索(売れ筋順)
+		List<Item> itemList = itemRepository.findAllOrderById();
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = BeanCopy.copyEntityToItemBean(itemList);
@@ -91,8 +88,10 @@ public class ItemShowCustomerController {
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("url", "/item/list/" + sortType);
+		model.addAttribute("isSearch", true);
+		model.addAttribute("isCategorySearch", false);
 
-		return "item/list/item_list";
+		return "item/list/list";
 	}
 
 	/**
@@ -125,8 +124,10 @@ public class ItemShowCustomerController {
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
 		model.addAttribute("url", "/item/list/category/" + sortType + "?categoryId=" + categoryId);
+		model.addAttribute("isCategorySearch", true);
+		model.addAttribute("isSearch", false);
 
-		return "item/list/item_list";
+		return "item/list/list";
 	}
 
 	/**
