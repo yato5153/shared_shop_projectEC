@@ -19,7 +19,6 @@ import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
-import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderShowForm;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserCouponsRepository;
@@ -173,13 +172,12 @@ public class OrderShowCustomerController {
         // 使用クーポン情報
         String couponName = null;
 
-        Optional<UserCoupon> userCoupon =
-        		userCouponsRepository.findByOrder_Id(id);
-
-        if (userCoupon.isPresent()) {
-            couponName =
-                    userCoupon.get().getCoupon().getCouponsName();
-        }
+//        Optional<UserCoupon> userCoupon =userCouponsRepository.findB(id);
+//
+//        if (userCoupon.isPresent()) {
+//            couponName =
+//                    userCoupon.get().getCoupon().getCouponsName();
+//        }
 
         // HTMLへ渡す情報
         model.addAttribute("order", orderBean);

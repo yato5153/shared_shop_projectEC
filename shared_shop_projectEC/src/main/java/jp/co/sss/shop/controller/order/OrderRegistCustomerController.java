@@ -1,8 +1,6 @@
 
 package jp.co.sss.shop.controller.order;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -97,8 +95,7 @@ public class OrderRegistCustomerController {
             return;
         }
 
-        List<UserCoupon> coupons =
-                userCouponsRepository.findByUser_IdAndControl(userId, 0);
+        List<UserCoupon> coupons = userCouponsRepository.findByUser_IdAndStatus(userId, 0);
 
         model.addAttribute("availableCoupons", coupons);
     }
@@ -118,7 +115,7 @@ private Optional<UserCoupon> findValidCoupon(
     }
 
     Optional<UserCoupon> result =
-            userCouponsRepository.findByIdAndUser_IdAndControl(
+            userCouponsRepository.findByIdAndUser_IdAndStatus(
                     userCouponId, userId, 0);
 
     if (result.isEmpty()) {
@@ -605,14 +602,14 @@ discountAmount = java.math.BigDecimal.valueOf(subtotal)
         }
 
         // クーポンを使用済みに変更
-        if (selectedUserCoupon != null) {
-
-        	selectedUserCoupon.setControl(1);
-            selectedUserCoupon.setOrder(order);
-
-            userCouponsRepository.save(
-                    selectedUserCoupon);
-        }
+//        if (selectedUserCoupon != null) {
+//
+//        	selectedUserCoupon.setControl(1);
+//            selectedUserCoupon.setOrder(order);
+//
+//            userCouponsRepository.save(
+//                    selectedUserCoupon);
+//        }
         
 
         // 商品合計5,000円以上で20%クーポンを付与
@@ -626,7 +623,7 @@ discountAmount = java.math.BigDecimal.valueOf(subtotal)
             UserCoupon newUserCoupon = new UserCoupon();
             newUserCoupon.setUser(user);
             newUserCoupon.setCoupon(repeatCoupon);
-            newUserCoupon.setControl(0);
+            newUserCoupon.setStatus(0);
 
             userCouponsRepository.save(newUserCoupon);
         }

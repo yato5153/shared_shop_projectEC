@@ -3,50 +3,58 @@
 	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
 
 <head>
-	<title th:text="#{user}+#{title.input.new}+' | '+ #{shop.title}"> </title>
+	<title>会員登録入力 | シェアードショップ</title>
 	<meta charset="UTF-8" />
 </head>
 
 <body class="user user_regist_input">
-	<h2 th:class="title" th:text="#{user}+#{title.input.new}"></h2>
-	<p th:class="input_message" th:text="#{msg.regist.input}"></p>
+	<h2 class="title">会員登録入力</h2>
+	<p th:class="input_message">登録する情報を入力してください。</p>
 
 	<div class="user_info_form_area">
 
-
 		<form th:action="@{/client/user/regist/check}" method="post" class="user_info_form" th:object="${userForm}">
 
-			<th:block th:if="${#fields.hasErrors()}">
-				<ul class="error_list">
-					<li th:each="err:${#fields.detailedErrors()}" th:text="${err.message}"></li>
-				</ul>
-				<br />
-			</th:block>
+			<ul th:if="${#fields.hasErrors('*')}" th:class="input_list">
+				<li th:each="err : ${#fields.errors('*')}" th:text="${err}" th:class="error_list"></li>
+			</ul>
 
 			<ul class="input_list">
 				<li>
-					<label><span class="input_title">[[#{userForm.email}]]</span></label>
-					<input type="text" th:field="*{email}" />
+					<label>
+						<span class="input_title">メールアドレス</span>
+						<input type="text" name="email" th:value="${userForm.email}" th:field="*{email}" />
+					</label>
 				</li>
 				<li>
-					<label><span class="input_title">[[#{userForm.password}]]</span></label>
-					<input type="password" th:field="*{password}" />
+					<label>
+						<span class="input_title">パスワード</span>
+						<input type="password" name="password" th:value="${userForm.password}" />
+					</label>
 				</li>
 				<li>
-					<label><span class="input_title">[[#{userForm.name}]]</span></label>
-					<input type="text"  th:field="*{name}" />
+					<label>
+						<span class="input_title">氏名</span>
+						<input type="text" name="name" th:value="${userForm.name}" />
+					</label>
 				</li>
 				<li>
-					<label><span class="input_title">[[#{userForm.postalCode}]]</span></label>
-					<input type="text"  th:field="*{postalCode}" />
+					<label>
+						<span class="input_title">郵便番号</span>
+						<input type="text" name="postalCode" th:value="${userForm.postalCode}" />
+					</label>
 				</li>
 				<li>
-					<label><span class="input_title">[[#{userForm.address}]]</span></label>
-					<textarea  rows="6" th:field="*{address}"></textarea>
+					<label>
+						<span class="input_title">住所</span>
+						<textarea name="address" rows="6" th:text="${userForm.address}"></textarea>
+					</label>
 				</li>
 				<li>
-					<label><span class="input_title">[[#{userForm.phoneNumber}]]</span></label>
-					<input type="text" th:field="*{phoneNumber}" />
+					<label>
+						<span class="input_title">電話番号</span>
+						<input type="text" name="phoneNumber" th:value="${userForm.phoneNumber}" />
+					</label>
 				</li>
 			</ul>
 			<input type="hidden" name="authority" value="2" />
