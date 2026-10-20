@@ -704,3 +704,14 @@ p.link_center {
 .coupon_select_area p {
     margin: 5px 0 10px;
 }
+/* ---- クーポン一覧 ---- */
+.user_coupon_display {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.user_coupon_display img {
+	width: 60%;
+}

@@ -1,10 +1,32 @@
+<!--
+<div class="debug">
+    <p>ユーザーID：<span th:text="${debugUserId}"></span></p>
+    <p>取得したクーポン件数：<span th:text="${debugCouponCount}"></span></p>
+    <p>取得したクーポン一覧：<span th:text="${debugcouponNames}"></span></p>
+</div>
+-->
+
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+	<title>クーポン一覧 | シェアードショップ</title>
+	<meta charset="UTF-8" />
 </head>
-<body>
-aa
+<body class="user_coupon">
+	<h2 class="title">
+		クーポン一覧
+	</h2>
+	<div th:if="${couponFalse}">
+		<p th:text="#{itemList.none}"></p>
+	</div>
+	<div class="user_coupon_display">
+    	<th:block th:each="couponName, status : ${couponNames}"
+			th:if="${status.count le 10}">
+        	<img th:src="@{'/img/coupon/' + ${couponName} + '.png'}"
+             	alt="クーポン画像" />
+    	</th:block>
+	</div>
 </body>
 </html>
