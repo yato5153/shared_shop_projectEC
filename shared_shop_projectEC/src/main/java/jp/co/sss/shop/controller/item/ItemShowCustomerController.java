@@ -88,8 +88,10 @@ public class ItemShowCustomerController {
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("url", "/item/list/" + sortType);
+		model.addAttribute("isSearch", true);
+		model.addAttribute("isCategorySearch", false);
 
-		return "item/list/item_list";
+		return "item/list/list";
 	}
 
 	/**
@@ -122,8 +124,10 @@ public class ItemShowCustomerController {
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
 		model.addAttribute("url", "/item/list/category/" + sortType + "?categoryId=" + categoryId);
+		model.addAttribute("isCategorySearch", true);
+		model.addAttribute("isSearch", false);
 
-		return "item/list/item_list";
+		return "item/list/list";
 	}
 
 	/**
@@ -151,6 +155,6 @@ public class ItemShowCustomerController {
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
 
-		return "item/detail/item_detail";
+		return "item/detail/detail";
 	}
 }

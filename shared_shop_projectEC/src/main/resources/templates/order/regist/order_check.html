@@ -1,102 +1,207 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+      th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
 <head>
-<title>注文内容最終確認 | シェアードショップ</title>
-<meta charset="UTF-8" />
+    <title>注文内容最終確認 | シェアードショップ</title>
+    <meta charset="UTF-8" />
 </head>
 <body class="user order_check">
-		<h2 class="title">注文内容最終確認</h2>
-		
-		<!-- 在庫不足のメッセージ -->
-		<div>
-			<ul>
-				<!-- 在庫数が1以上の場合のメッセージ -->
-				<li class="err" th:each="itemNameLessThan: ${itemNameListLessThan}">
-					<span th:text="#{mark.attention} + ${itemNameLessThan} + #{stock.lessThan}"></span>
-				</li>
-				<!-- 在庫数が0の場合のメッセージ -->
-				<li class="err" th:each="itemNameZero: ${itemNameListZero}">
-					<span th:text="#{mark.attention} + ${itemNameZero} + #{stock.zero}"></span>
-				</li>
-			</ul>
-		</div>
-				
-		<table class="list_table item_detail">
-			<tr>
-				<th>商品画像</th>
-				<th>商品名</th>
-				<th>単価</th>
-				<th>数量</th>
-				<th>小計</th>
-			</tr>
-			<tr th:each="orderItem: ${orderItemBeans}">
-				<td th:text="${orderItem.name}"></td>
-				<td>
-					<img th:src="@{/img/{image}(image=${orderItem.image})}" th:if="${orderItem.image != null}" />
-					<img th:src="@{/img/common/no_image.jpg}" th:if="${orderItem.image == null}" />
-				</td>
-				<td th:text="${orderItem.price}"></td>
-				<td th:text="${orderItem.orderNum}"></td>
-				<td th:text="${orderItem.subtotal}"></td>
-			</tr>
-			<tr>
-				<td colspan="3"></td>
-				<td class="total">合計</td>
-				<td class="total" th:text="${total}"></td>
-			</tr>
-		</table>
-		<div class="user_info_form_area">
-			<table class="detail_table address">
-				<caption class="table_caption">お届け先</caption>
-				<tr>
-					<th>郵便番号</th>
-					<td th:text="${orderForm.postalCode}"></td>
-				</tr>
-				<tr>
-					<th>住所</th>
-					<td th:text="${orderForm.address}"></td>
-				</tr>
-				<tr>
-					<th>氏名</th>
-					<td th:text="${orderForm.name}"></td>
-				</tr>
-				<tr>
-					<th>電話番号</th>
-					<td th:text="${orderForm.phoneNumber}"></td>
-				</tr>
-			</table>
-			<table class="detail_table pay">
-				<caption class="table_caption">お支払い方法</caption>
-				<tr>
-					<th>お支払い方法</th>
-					<td th:switch="${orderForm.payMethod}">
-                    	<span th:case="1">クレジットカード</span>
-                    	<span th:case="2">銀行振り込み</span>
-                    	<span th:case="3">着払い</span>
-                    	<span th:case="4">電子マネー</span>
-                    	<span th:case="5">コンビニ決済</span>
-					</td>
-				</tr>
-			</table>
-			<form method="post" th:action="@{/order/complete}" >
-				<input type="hidden" name="postalCode" th:value="${orderForm.postalCode}"/>
-				<input type="hidden" name="address" th:value="${orderForm.address}"/>
-				<input type="hidden" name="name" th:value="${orderForm.name}"/>
-				<input type="hidden" name="phoneNumber" th:value="${orderForm.phoneNumber}"/>
-				<input type="hidden" name="payMethod" th:value="${orderForm.payMethod}"/>
-				
-				<input class="send_button" type="submit" value="ご注文の確定" />
-			</form>
-			<form method="post" th:action="@{/payment/input}" class="update">
-				<input type="hidden" name="backFlg" value="true" />
-            	<input type="hidden" name="postalCode" th:value="${orderForm.postalCode}"/>
-				<input type="hidden" name="address" th:value="${orderForm.address}"/>
-				<input type="hidden" name="name" th:value="${orderForm.name}"/>
-				<input type="hidden" name="phoneNumber" th:value="${orderForm.phoneNumber}"/>
-				<input type="hidden" name="payMethod" th:value="${orderForm.payMethod}"/>
-			    <input class="back_button" type="submit" value="戻る" />
-			</form>
-		</div>
+
+    <h2 class="title">注文内容最終確認</h2>
+
+    <!-- 在庫不足のメッセージ -->
+    <div>
+        <ul>
+            <!-- 在庫数が1以上の場合のメッセージ -->
+            <li class="err"
+                th:each="itemNameLessThan : ${itemNameListLessThan}">
+                <span th:text="#{mark.attention} + ${itemNameLessThan} + #{stock.lessThan}"></span>
+            </li>
+
+            <!-- 在庫数が0の場合のメッセージ -->
+            <li class="err"
+                th:each="itemNameZero : ${itemNameListZero}">
+                <span th:text="#{mark.attention} + ${itemNameZero} + #{stock.zero}"></span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 注文商品一覧 -->
+    <table class="list_table item_detail">
+        <tr>
+            <th>商品画像</th>
+            <th>商品名</th>
+            <th>単価</th>
+            <th>数量</th>
+            <th>小計</th>
+        </tr>
+
+        <tr th:each="orderItem : ${orderItemBeans}">
+            <td>
+                <img th:src="@{/img/{image}(image=${orderItem.image})}"
+                     th:if="${orderItem.image != null}" />
+                <img th:src="@{/img/common/no_image.jpg}"
+                     th:if="${orderItem.image == null}" />
+            </td>
+            <td th:text="${orderItem.name}"></td>
+            <td th:text="${orderItem.price}"></td>
+            <td th:text="${orderItem.orderNum}"></td>
+            <td th:text="${orderItem.subtotal}"></td>
+        </tr>
+
+        <!-- 割引前の商品合計 -->
+        <tr>
+            <td colspan="3"></td>
+            <td class="total">商品合計</td>
+            <td class="total" th:text="${subtotal}"></td>
+        </tr>
+
+        <!-- クーポン割引 -->
+        <tr th:if="${discountAmount > 0}">
+            <td colspan="3"></td>
+            <td class="total">クーポン割引</td>
+            <td class="total"
+                th:text="|-${discountAmount}円|"></td>
+        </tr>
+
+        <!-- 割引後の合計 -->
+        <tr>
+            <td colspan="3"></td>
+            <td class="total">お支払い合計</td>
+            <td class="total" th:text="${total}"></td>
+        </tr>
+    </table>
+
+    <div class="user_info_form_area">
+
+        <!-- お届け先 -->
+        <table class="detail_table address">
+            <caption class="table_caption">お届け先</caption>
+
+            <tr>
+                <th>郵便番号</th>
+                <td th:text="${orderForm.postalCode}"></td>
+            </tr>
+
+            <tr>
+                <th>住所</th>
+                <td th:text="${orderForm.address}"></td>
+            </tr>
+
+            <tr>
+                <th>氏名</th>
+                <td th:text="${orderForm.name}"></td>
+            </tr>
+
+            <tr>
+                <th>電話番号</th>
+                <td th:text="${orderForm.phoneNumber}"></td>
+            </tr>
+        </table>
+
+        <!-- 支払い方法 -->
+        <table class="detail_table pay">
+            <caption class="table_caption">お支払い方法</caption>
+
+            <tr>
+                <th>お支払い方法</th>
+                <td th:switch="${orderForm.payMethod}">
+                    <span th:case="1">クレジットカード</span>
+                    <span th:case="2">銀行振り込み</span>
+                    <span th:case="3">着払い</span>
+                    <span th:case="4">電子マネー</span>
+                    <span th:case="5">コンビニ決済</span>
+                </td>
+            </tr>
+
+            <!-- 使用クーポン -->
+            <tr>
+                <th>使用クーポン</th>
+                <td>
+                    <span th:if="${couponName != null}"
+                          th:text="${couponName}"></span>
+                    <span th:if="${couponName == null}">
+                        使用しない
+                    </span>
+                </td>
+            </tr>
+
+            <!-- クーポン割引金額 -->
+            <tr th:if="${discountAmount > 0}">
+                <th>割引金額</th>
+                <td th:text="|${discountAmount}円OFF|"></td>
+            </tr>
+        </table>
+
+        <!-- 注文確定 -->
+        <form method="post" th:action="@{/order/complete}">
+
+            <input type="hidden"
+                   name="postalCode"
+                   th:value="${orderForm.postalCode}" />
+
+            <input type="hidden"
+                   name="address"
+                   th:value="${orderForm.address}" />
+
+            <input type="hidden"
+                   name="name"
+                   th:value="${orderForm.name}" />
+
+            <input type="hidden"
+                   name="phoneNumber"
+                   th:value="${orderForm.phoneNumber}" />
+
+            <input type="hidden"
+                   name="payMethod"
+                   th:value="${orderForm.payMethod}" />
+
+            <!-- 選択したクーポンIDを引き継ぐ -->
+            <input type="hidden"
+                   name="userCouponId"
+                   th:value="${orderForm.userCouponId}" />
+
+            <input class="send_button"
+                   type="submit"
+                   value="ご注文の確定" />
+        </form>
+
+        <!-- 支払い方法選択画面に戻る -->
+        <form method="post"
+              th:action="@{/payment/input/back}"
+              class="update">
+
+            <input type="hidden"
+                   name="postalCode"
+                   th:value="${orderForm.postalCode}" />
+
+            <input type="hidden"
+                   name="address"
+                   th:value="${orderForm.address}" />
+
+            <input type="hidden"
+                   name="name"
+                   th:value="${orderForm.name}" />
+
+            <input type="hidden"
+                   name="phoneNumber"
+                   th:value="${orderForm.phoneNumber}" />
+
+            <input type="hidden"
+                   name="payMethod"
+                   th:value="${orderForm.payMethod}" />
+
+            <!-- 戻った場合も選択状態を保持 -->
+            <input type="hidden"
+                   name="userCouponId"
+                   th:value="${orderForm.userCouponId}" />
+
+            <input class="back_button"
+                   type="submit"
+                   value="戻る" />
+        </form>
+
+    </div>
 </body>
 </html>

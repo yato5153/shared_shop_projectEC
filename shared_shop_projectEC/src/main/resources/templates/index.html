@@ -18,7 +18,7 @@
 		<div class="item">
 			<div class="item_name" th:text="${item.name}"></div>
 			<a th:href="@{/item/detail/}+${item.id}">
-			    <img th:src="@{/img/{image}(image=${item.image})}" th:if="${item.image != null}" />
+			    <img th:src="@{/img/product/{image}(image=${item.image})}" th:if="${item.image != null}" />
 			    <img th:src="@{/img/common/no_image.jpg}" th:if="${item.image == null}" />
 			</a>
 		</div>

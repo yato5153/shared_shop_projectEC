@@ -3,7 +3,7 @@
 	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
 
 <head>
-	<title th:text="#{item}+#{title.list}+' | '+ #{shop.title}"> </title>
+	<title>商品一覧 | シェアードショップ</title>
 	<meta charset="UTF-8" />
 </head>
 
@@ -11,16 +11,26 @@
 
 	<h2 th:class="title" th:text="#{item}+#{title.list}"></h2>
 
-	<div class="sorted_by">
-		<span th:if="${sortType==1}" th:text="#{sort.latest.str}"></span>
-		<a th:unless="${sortType==1}" th:href="@{/client/item/list/1(categoryId=${categoryId})}"
+	<div class="sorted_by">	
+		<!--/* 商品一覧新着順 */-->
+		<span th:if="${isSearch && sortType == 1}" th:text="#{sort.latest.str}"></span>
+		<a th:if="${isSearch && sortType != 1}" th:href="@{/item/list/1}"
 			th:text="#{sort.latest.str}"></a>
-		<span th:if="${sortType==2}" th:text="#{sort.hotsell.str}"></span>
-		<a th:unless="${sortType==2}" th:href="@{/client/item/list/2(categoryId=${categoryId})}"
+			
+		<!--/* 商品一覧売れ筋順 */-->
+		<span th:if="${isSearch && sortType == 2}" th:text="#{sort.hotsell.str}"></span>
+		<a th:if="${isSearch && sortType != 2}" th:href="@{/item/list/2}"
 			th:text="#{sort.hotsell.str}"></a>
-
-		<p th:text="#{msg.client.item.list.none}" th:if="${#lists.isEmpty(items)}"></p>
-
+			
+		<!--/* カテゴリ検索後、新着順 */-->
+		<span th:if="${isCategorySearch && sortType == 1}" th:text="#{sort.latest.str}"></span>
+		<a th:if="${isCategorySearch && sortType != 1}" th:href="@{/item/list/category/1(categoryId=${categoryId})}"
+			th:text="#{sort.latest.str}"></a>
+			
+		<!--/* カテゴリ検索後、売れ筋順 */-->
+		<span th:if="${isCategorySearch && sortType == 2}" th:text="#{sort.hotsell.str}"></span>
+		<a th:if="${isCategorySearch && sortType != 2}" th:href="@{/item/list/category/2(categoryId=${categoryId})}"
+			th:text="#{sort.hotsell.str}"></a>	
 	</div>
 
 
@@ -30,16 +40,16 @@
 				<th th:text="#{data.item.image}"></th>
 				<th th:text="#{data.item.name}"></th>
 				<th th:text="#{data.item.price}"></th>
-				<th th:text="#{category}"></th>
+				<th th:text="#{data.category}"></th>
 			</tr>
 			<!--/* 商品一覧 */-->
 			<tr th:each="item, status: ${items}">
 				<td class="image">
-					<img th:src="@{/images/{image}(image=${item.image})}" th:if="${item.image != null}" />
-					<img th:src="@{/images/common/no_image.jpg}" th:if="${item.image == null}" />
+					<img th:src="@{/img/product/{image}(image=${item.image})}" th:if="${item.image != null}" />
+					<img th:src="@{/img/common/no_image.jpg}" th:if="${item.image == null}" />
 
 				</td>
-				<td><a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
+				<td><a th:href="@{/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
 				<td th:text="${item.price}"></td>
 				<td th:text="${item.categoryName}"></td>
 			</tr>
