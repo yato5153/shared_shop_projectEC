@@ -530,11 +530,10 @@ couponName = userCoupon.getCoupon().getCouponsName();
         // クーポンの再確認
         if (form.getUserCouponId() != null) {
 
-            Optional<UserCoupon> couponResult =
-                    findValidCoupon(
-                            form.getUserCouponId(),
-                            userId,
-                            subtotal);
+        	Optional<UserCoupon> couponResult =
+        	        userCouponsRepository.findUnusedCouponForUpdate(
+        	                form.getUserCouponId(),
+        	                userId);
 
             if (couponResult.isEmpty()) {
 
@@ -547,6 +546,20 @@ couponName = userCoupon.getCoupon().getCouponsName();
             }
 
             selectedUserCoupon = couponResult.get();
+            java.math.BigDecimal discountRate =
+                    selectedUserCoupon.getCoupon().getDiscountRate();
+
+            if (subtotal <= 0
+                    || discountRate == null
+                    || discountRate.compareTo(java.math.BigDecimal.ZERO) <= 0
+                    || discountRate.compareTo(new java.math.BigDecimal("100")) > 0) {
+
+                redirectAttributes.addFlashAttribute(
+                        "couponError",
+                        "クーポンを利用できません。もう一度選択してください。");
+
+                return "redirect:/basket/list/0";
+            }
 
 
 discountAmount = java.math.BigDecimal.valueOf(subtotal)
