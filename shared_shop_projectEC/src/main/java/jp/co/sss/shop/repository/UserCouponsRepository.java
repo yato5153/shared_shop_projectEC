@@ -44,6 +44,6 @@ public interface UserCouponsRepository extends JpaRepository<UserCoupon, Integer
             @Param("userId") Integer userId
     );
 
-    // 指定注文で使用されたクーポンを取得
-    //Optional<UserCoupon> findByOrder_Id(Integer orderId);
+//   指定注文で使用されたクーポンを取得
+    Optional<UserCoupon> findByOrder_Id(Integer orderId);
 }

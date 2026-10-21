@@ -19,6 +19,7 @@ import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
+import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderShowForm;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserCouponsRepository;
@@ -77,10 +78,9 @@ public class OrderShowCustomerController {
                         * orderItem.getQuantity();
             }
 
-            int discount = order.getDiscountAmount() == null
-                    ? 0 : order.getDiscountAmount();
+            Optional<UserCoupon> usedCoupon = userCouponsRepository.findByOrder_Id(order.getId());
 
-            orderBean.setTotal(Math.max(0, total - discount));
+//            orderBean.setTotal(Math.max(0, total - discount));
 
             orderBeanList.add(orderBean);
         }
@@ -160,14 +160,11 @@ public class OrderShowCustomerController {
                 PriceCalc.orderItemPriceTotal(
                         orderItemBeanList);
 
-        // 注文時点の割引金額
-        int discountAmount =
-                order.getDiscountAmount() == null
-                        ? 0 : order.getDiscountAmount();
+        Optional<UserCoupon> usedCoupon =userCouponsRepository.findByOrder_Id(id);
 
-        // クーポン適用後の支払金額
-        int total =
-                Math.max(0, subtotal - discountAmount);
+//        // クーポン適用後の支払金額
+//        int total =
+//                Math.max(0, subtotal - discountAmount);
 
         // 使用クーポン情報
         String couponName = null;
@@ -183,9 +180,9 @@ public class OrderShowCustomerController {
         model.addAttribute("order", orderBean);
         model.addAttribute("orderItemBeans", orderItemBeanList);
         model.addAttribute("subtotal", subtotal);
-        model.addAttribute("discountAmount", discountAmount);
+//        model.addAttribute("discountAmount", discountAmount);
         model.addAttribute("couponName", couponName);
-        model.addAttribute("total", total);
+//        model.addAttribute("total", total);
 
         return "order/detail/order_detail";
     }

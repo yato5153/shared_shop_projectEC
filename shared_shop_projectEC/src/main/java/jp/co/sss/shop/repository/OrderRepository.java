@@ -30,4 +30,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     // 注文IDと会員IDに該当する注文情報を取得
     Optional<Order> findByIdAndUserId(int id, int userId);
+
+//    // 川上さんのOrderShowCustomerControllerの変更 注文詳細表示処理
+//    Optional<UserCoupon> findByOrder_id(int id);
 }
