@@ -39,8 +39,8 @@
 		<tr th:each="orderItem: ${orderItemBeans}">
 			<td th:text="${orderItem.name}"></td>
 			<td>
-				<img th:src="@{/images/{image}(image=${orderItem.image})}" th:if="${orderItem.image != null}" />
-				<img th:src="@{/images/common/no_image.jpg}" th:if="${orderItem.image == null}" />
+				<img th:src="@{/img/product/{image}(image=${orderItem.image})}" th:if="${orderItem.image != null}" />
+				<img th:src="@{/img/common/no_image.jpg}" th:if="${orderItem.image == null}" />
 			</td>
 			<td th:text="${orderItem.price}"></td>
 			<td th:text="${orderItem.orderNum}"></td>

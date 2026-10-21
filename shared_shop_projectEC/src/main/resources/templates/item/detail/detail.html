@@ -14,8 +14,8 @@
 	<div class="info_form_area" th:object="${item}">
 		<div class="item_detail_area">
 			<div class="item_image_area">
-				<img th:if="*{image != null}" th:src="@{/images/{image}(image=*{image})}"></img>
-				<img th:if="*{image == null}" th:src="@{/images/common/no_image.jpg}"></img>
+				<img th:if="*{image != null}" th:src="@{/img/product/{image}(image=*{image})}"></img>
+				<img th:if="*{image == null}" th:src="@{/img/common/no_image.jpg}"></img>
 			</div>
 			<dl class="item_detail_list">
 				<dt>[[#{data.item.name}]]</dt>
