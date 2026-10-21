@@ -1,4 +1,4 @@
-package jp.co.sss.shop.controller;
+package jp.co.sss.shop.controller.basket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import jp.co.sss.shop.form.ItemForm;
 import jp.co.sss.shop.repository.ItemRepository;
 
 @Controller
-public class ClientBasketController {
+public class BasketCreateController {
 	
 	@Autowired
 	ItemRepository itemRepository;

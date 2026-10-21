@@ -28,7 +28,7 @@ import jp.co.sss.shop.util.PriceCalc;
  * 注文管理 一覧・詳細表示機能（一般会員用）
  */
 @Controller
-public class OrderShowCustomerController {
+public class OrderShowController {
 
     @Autowired
     OrderRepository orderRepository;

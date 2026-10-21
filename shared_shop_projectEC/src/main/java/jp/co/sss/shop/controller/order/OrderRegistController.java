@@ -43,7 +43,7 @@ import jp.co.sss.shop.util.PriceCalc;
  * クーポン機能対応版
  */
 @Controller
-public class OrderRegistCustomerController {
+public class OrderRegistController {
 
     @Autowired
     UserRepository userRpository;
