@@ -62,6 +62,13 @@ public class Order {
     private Integer payMethod;
 
     /**
+     * クーポン割引金額（追加）
+     *
+    @Column(name = "discount_amount", nullable = false)
+    private Integer discountAmount = 0;
+    */
+
+    /**
      * 注文日付
      */
     @Column(insertable = false)
@@ -127,6 +134,22 @@ public class Order {
     public void setPayMethod(Integer payMethod) {
         this.payMethod = payMethod;
     }
+
+    /**
+     * クーポン割引金額の取得（追加）
+     *
+    public Integer getDiscountAmount() {
+        return discountAmount;
+    }
+    */
+
+    /**
+     * クーポン割引金額の設定（追加）
+     *
+    public void setDiscountAmount(Integer discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+    */
 
     public Date getInsertDate() {
         return insertDate;

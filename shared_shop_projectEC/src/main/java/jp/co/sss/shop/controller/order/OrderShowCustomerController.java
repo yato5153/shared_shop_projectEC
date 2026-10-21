@@ -19,7 +19,6 @@ import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
-import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderShowForm;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserCouponsRepository;
@@ -78,9 +77,17 @@ public class OrderShowCustomerController {
                         * orderItem.getQuantity();
             }
 
-            Optional<UserCoupon> usedCoupon = userCouponsRepository.findByOrder_Id(order.getId());
+            //変更箇所
+            Integer discountAmount =
+                    (Integer) session.getAttribute("discountAmount");
 
-//            orderBean.setTotal(Math.max(0, total - discount));
+                model.addAttribute("discountAmount", discountAmount);
+                
+            int discount = discountAmount == null
+                    ? 0 : discountAmount;
+            //ここまで
+            
+            orderBean.setTotal(Math.max(0, total - discount));
 
             orderBeanList.add(orderBean);
         }
@@ -160,11 +167,24 @@ public class OrderShowCustomerController {
                 PriceCalc.orderItemPriceTotal(
                         orderItemBeanList);
 
-        Optional<UserCoupon> usedCoupon =userCouponsRepository.findByOrder_Id(id);
+        // 注文時点の割引金額
+        //int discountAmount =
+        		//discountAmount == null
+                       //? 0 : discountAmount;
+        
+        //変更箇所
+        Integer discountAmount =
+                (Integer) session.getAttribute("discountAmount");
 
-//        // クーポン適用後の支払金額
-//        int total =
-//                Math.max(0, subtotal - discountAmount);
+            model.addAttribute("discountAmount", discountAmount);
+            
+        discountAmount = discountAmount == null
+                ? 0 : discountAmount;
+        //ここまで
+
+        // クーポン適用後の支払金額
+        int total =
+                Math.max(0, subtotal - discountAmount);
 
         // 使用クーポン情報
         String couponName = null;
@@ -180,9 +200,9 @@ public class OrderShowCustomerController {
         model.addAttribute("order", orderBean);
         model.addAttribute("orderItemBeans", orderItemBeanList);
         model.addAttribute("subtotal", subtotal);
-//        model.addAttribute("discountAmount", discountAmount);
+        model.addAttribute("discountAmount", discountAmount);
         model.addAttribute("couponName", couponName);
-//        model.addAttribute("total", total);
+        model.addAttribute("total", total);
 
         return "order/detail/order_detail";
     }

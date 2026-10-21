@@ -39,7 +39,7 @@
 
         <tr th:each="orderItem : ${orderItemBeans}">
             <td>
-                <img th:src="@{/img/{image}(image=${orderItem.image})}"
+                <img th:src="@{/img/product/{image}(image=${orderItem.image})}"
                      th:if="${orderItem.image != null}" />
                 <img th:src="@{/img/common/no_image.jpg}"
                      th:if="${orderItem.image == null}" />
@@ -120,7 +120,7 @@
                 <th>使用クーポン</th>
                 <td>
                     <span th:if="${couponName != null}"
-                          th:text="${couponName}"></span>
+                          th:text="#{${couponName}}"></span>
                     <span th:if="${couponName == null}">
                         使用しない
                     </span>

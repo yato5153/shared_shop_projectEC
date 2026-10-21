@@ -46,9 +46,8 @@ public class UserCoupon {
 	 * クーポンを使用した注文（これはテーブルにないから作るとエラーになるのでは・gettersetterは未作成）
 	 */
     @OneToOne
-    @JoinColumn(name = "order_id",referencedColumnName ="id")
+    @JoinColumn(name = "order_id")
     private Order order;
-    	
 
 	/**
 	 * getterとsetter
@@ -92,6 +91,5 @@ public class UserCoupon {
 	public void setOrder(Order order) {
 		this.order = order;
 	}
-
 
 }
