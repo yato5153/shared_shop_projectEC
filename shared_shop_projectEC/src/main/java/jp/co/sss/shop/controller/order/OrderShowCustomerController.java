@@ -77,9 +77,16 @@ public class OrderShowCustomerController {
                         * orderItem.getQuantity();
             }
 
-            int discount = order.getDiscountAmount() == null
-                    ? 0 : order.getDiscountAmount();
+            //変更箇所
+            Integer discountAmount =
+                    (Integer) session.getAttribute("discountAmount");
 
+                model.addAttribute("discountAmount", discountAmount);
+                
+            int discount = discountAmount == null
+                    ? 0 : discountAmount;
+            //ここまで
+            
             orderBean.setTotal(Math.max(0, total - discount));
 
             orderBeanList.add(orderBean);
@@ -161,9 +168,19 @@ public class OrderShowCustomerController {
                         orderItemBeanList);
 
         // 注文時点の割引金額
-        int discountAmount =
-                order.getDiscountAmount() == null
-                        ? 0 : order.getDiscountAmount();
+        //int discountAmount =
+        		//discountAmount == null
+                       //? 0 : discountAmount;
+        
+        //変更箇所
+        Integer discountAmount =
+                (Integer) session.getAttribute("discountAmount");
+
+            model.addAttribute("discountAmount", discountAmount);
+            
+        discountAmount = discountAmount == null
+                ? 0 : discountAmount;
+        //ここまで
 
         // クーポン適用後の支払金額
         int total =

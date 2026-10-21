@@ -89,7 +89,7 @@
 						<input type="radio" name="userCouponId" th:value="${userCoupon.id}"
 							th:checked="${orderForm.userCouponId == userCoupon.id}" />
 
-						<span th:text="${userCoupon.coupon.couponsName}"></span>
+						<span th:text="#{${userCoupon.coupon.couponsName}}"></span>
 
 						（
 						<span th:text="${userCoupon.coupon.discountRate}"></span>

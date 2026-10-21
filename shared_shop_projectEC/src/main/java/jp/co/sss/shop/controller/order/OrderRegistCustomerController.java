@@ -423,6 +423,8 @@ couponName = userCoupon.getCoupon().getCouponsName();
         model.addAttribute("subtotal", subtotal);
         model.addAttribute(
                 "discountAmount", discountAmount);
+        session.setAttribute("discountAmount", discountAmount);
+        
         model.addAttribute("couponName", couponName);
         model.addAttribute("total", total);
         model.addAttribute("orderForm", form);
@@ -587,7 +589,7 @@ discountAmount = java.math.BigDecimal.valueOf(subtotal)
         order.setName(form.getName());
         order.setPhoneNumber(form.getPhoneNumber());
         order.setPayMethod(form.getPayMethod());
-        order.setDiscountAmount(discountAmount);
+        //order.setDiscountAmount(discountAmount);
 
         User user = userRpository.getById(userId);
 
@@ -615,14 +617,14 @@ discountAmount = java.math.BigDecimal.valueOf(subtotal)
         }
 
         // クーポンを使用済みに変更
-//        if (selectedUserCoupon != null) {
-//
-//        	selectedUserCoupon.setControl(1);
-//            selectedUserCoupon.setOrder(order);
-//
-//            userCouponsRepository.save(
-//                    selectedUserCoupon);
-//        }
+        if (selectedUserCoupon != null) {
+
+       	selectedUserCoupon.setStatus(1);
+            selectedUserCoupon.setOrder(order);
+
+           userCouponsRepository.save(
+                   selectedUserCoupon);
+         }
         
 
         // 商品合計5,000円以上で20%クーポンを付与
