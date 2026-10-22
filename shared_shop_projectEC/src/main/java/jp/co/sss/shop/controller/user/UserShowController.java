@@ -34,6 +34,14 @@ public class UserShowController {
 	@Autowired
 	HttpSession	session;
 	
+	/**
+	 * 会員詳細表示処理
+	 *
+	 * @param model Viewとの値受渡し
+	 * @param form 会員情報フォーム
+	 * @param session セッション情報
+	 * @return "user/detail/detail" 会員詳細表示画面へ
+	 */
 	@RequestMapping(path = "/client/user/detail/{id}")
 	public String showLoginUser(@PathVariable int id, Model model, @ModelAttribute UserForm form, HttpSession session) {
 		// 表示対象の会員情報を取得

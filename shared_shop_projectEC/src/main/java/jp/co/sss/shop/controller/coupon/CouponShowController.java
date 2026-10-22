@@ -33,6 +33,7 @@ public class CouponShowController {
 	 */
 	@RequestMapping(path = "/coupon/list", method = RequestMethod.GET)
 	public String list(Model model) {
+		
 		Object user = session.getAttribute("user");
 		Integer userId = ((UserBean) user).getId();
 		
@@ -52,11 +53,6 @@ public class CouponShowController {
 		model.addAttribute("couponNames", couponNames);
 		model.addAttribute("couponFalse", couponFalse);
 		
-		//デバッグ用、有効にするとクーポン一覧画面に表示される
-		//model.addAttribute("debugUserId", userId);
-		//model.addAttribute("debugCouponCount", couponNames.size());
-		//model.addAttribute("debugcouponNames", couponNames);
-
 		return "coupon/show";
 	}
 }

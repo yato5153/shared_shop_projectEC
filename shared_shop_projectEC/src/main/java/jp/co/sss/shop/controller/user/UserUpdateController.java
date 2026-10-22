@@ -44,7 +44,7 @@ public class UserUpdateController {
 	 *
 	 * @param model Viewとの値受渡し
 	 * @param form  会員情報フォーム
-	 * @return "user/update/user_update_input_admin" 会員情報 変更入力画面へ
+	 * @return "user/update/update_input" 会員情報 変更入力画面へ
 	
 	 **/
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.POST)
@@ -80,7 +80,7 @@ public class UserUpdateController {
 	/**
 	 * 会員新規登録の入力エラー時
 	 * 
-	 * @return "user/update/user_update_input_admin" 会員情報 変更入力画面へ
+	 * @return "user/update/update_input" 会員情報 変更入力画面へ
 	 */
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.GET)
 	public String updateCustomerInputError() {
@@ -95,8 +95,8 @@ public class UserUpdateController {
 	 * @param form   会員情報フォーム
 	 * @param result 入力チェック結果
 	 * @return 
-	 * 入力値エラーあり："redirect:/user/update/input/admin" 会員情報登録画面へ 
-	 * 入力値エラーなし："user/update/user_update_check_admin" 会員情報 変更確認画面へ
+	 * 入力値エラーあり："redirect:/client/user/update/input" 会員情報登録画面へ 
+	 * 入力値エラーなし："user/update/update_check" 会員情報 変更確認画面へ
 	 */
 	@RequestMapping(path = "/client/user/update/check", method = RequestMethod.POST)
 	public String updateCheck(Model model, @Valid @ModelAttribute UserForm form, BindingResult result,
@@ -119,7 +119,7 @@ public class UserUpdateController {
 	 * @param model Viewとの値受渡し
 	 * @param form  会員情報
 	 * @param redirectAttributes リダイレクト後情報保持
-	 * @return "user/update/user_update_complete_admin" 会員情報 変更完了画面へ
+	 * @return "redirect:/user/update/complete" 会員情報 変更完了画面へ
 	 */
 	@RequestMapping(path = "/client/user/update/complete", method = RequestMethod.POST)
 	public String updateComplete(Model model, @ModelAttribute UserForm form, RedirectAttributes redirectAttributes) {
@@ -145,8 +145,10 @@ public class UserUpdateController {
 
 		// セッションからログインユーザーの情報を取得
 		UserBean userBean = (UserBean) session.getAttribute("user");
+		
 		// 変更対象の会員が、ログインユーザと一致していた場合セッション情報を変更
 		if (user.getId().equals(userBean.getId())) {
+			
 			// Userエンティティの各フィールドの値をUserBeanにコピー
 			BeanUtils.copyProperties(form, userBean);
 			// 会員情報をViewに渡す
@@ -162,7 +164,7 @@ public class UserUpdateController {
 	/**
 	 * 会員情報変更完了画面表示
 	 *
-	 * @return "user/update/user_update_complete_admin" 会員情報 変更完了画面へ
+	 * @return "user/update/update_complete" 会員情報 変更完了画面へ
 	 */
 	@RequestMapping(path = "/user/update/complete", method = RequestMethod.GET)
 	public String updateCompleteRedirect() {
