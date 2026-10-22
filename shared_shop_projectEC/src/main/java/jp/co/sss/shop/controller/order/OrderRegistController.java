@@ -87,9 +87,7 @@ public class OrderRegistController {
 		Integer userId = getLoginUserId();
 
 		if (userId == null) {
-			model.addAttribute(
-					"availableCoupons",
-					new ArrayList<UserCoupon>());
+			model.addAttribute("availableCoupons", new ArrayList<UserCoupon>());
 			return;
 		}
 
@@ -102,17 +100,13 @@ public class OrderRegistController {
 	 * 選択クーポンの使用可否を確認
 	 */
 
-	private Optional<UserCoupon> findValidCoupon(
-			Integer userCouponId,
-			Integer userId,
-			int subtotal) {
+	private Optional<UserCoupon> findValidCoupon(Integer userCouponId, Integer userId, int subtotal) {
 
 		if (userCouponId == null || userId == null || subtotal <= 0) {
 			return Optional.empty();
 		}
 
-		Optional<UserCoupon> result = userCouponsRepository.findByIdAndUser_IdAndStatus(
-				userCouponId, userId, 0);
+		Optional<UserCoupon> result = userCouponsRepository.findByIdAndUser_IdAndStatus(userCouponId, userId, 0);
 
 		if (result.isEmpty()) {
 			return Optional.empty();
@@ -220,12 +214,9 @@ public class OrderRegistController {
 
 		if (result.hasErrors()) {
 
-			redirectAttributes.addFlashAttribute(
-					"org.springframework.validation.BindingResult.addressForm",
-					result);
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.addressForm", result);
 
-			redirectAttributes.addFlashAttribute(
-					"addressForm", form);
+			redirectAttributes.addFlashAttribute("addressForm", form);
 
 			return "redirect:/address/input";
 		}
@@ -279,6 +270,7 @@ public class OrderRegistController {
 
 		if (basketBeanList == null
 				|| basketBeanList.isEmpty()) {
+			
 			return "redirect:/basket/list/0";
 		}
 
@@ -296,9 +288,7 @@ public class OrderRegistController {
 			if (basketBean.getOrderNum() == null
 					|| basketBean.getOrderNum() <= 0) {
 
-				model.addAttribute(
-						"quantityError",
-						"注文数量は1以上を指定してください。");
+				model.addAttribute("quantityError", "注文数量は1以上を指定してください。");
 
 				return inputPaymentBack(model, form);
 			}
@@ -311,19 +301,15 @@ public class OrderRegistController {
 
 				if (itemStockLessThanOrderNum.getStock() > 0) {
 
-					itemNameListLessThan.add(
-							itemStockLessThanOrderNum.getName());
+					itemNameListLessThan.add(itemStockLessThanOrderNum.getName());
 
-					basketBean.setOrderNum(
-							itemStockLessThanOrderNum.getStock());
+					basketBean.setOrderNum(itemStockLessThanOrderNum.getStock());
 
-					basketBean.setStock(
-							itemStockLessThanOrderNum.getStock());
+					basketBean.setStock(itemStockLessThanOrderNum.getStock());
 
 				} else {
 
-					itemNameListZero.add(
-							basketBean.getName());
+					itemNameListZero.add(basketBean.getName());
 
 					itemListZero.add(basketBean);
 				}
@@ -331,21 +317,20 @@ public class OrderRegistController {
 		}
 
 		for (BasketBean itemZero : itemListZero) {
+			
 			basketBeanList.remove(itemZero);
 		}
 
 		// 注文商品情報を生成
 		for (BasketBean basketBean : basketBeanList) {
 
-			Item item = itemRepository
-					.getById(basketBean.getId());
+			Item item = itemRepository.getById(basketBean.getId());
 
 			OrderItemBean orderItemBean = new OrderItemBean();
 
 			BeanUtils.copyProperties(item, orderItemBean);
 
-			orderItemBean.setOrderNum(
-					basketBean.getOrderNum());
+			orderItemBean.setOrderNum(basketBean.getOrderNum());
 
 			int subtotal = item.getPrice() * basketBean.getOrderNum();
 
@@ -354,8 +339,7 @@ public class OrderRegistController {
 			orderItemBeanList.add(orderItemBean);
 		}
 
-		int subtotal = PriceCalc.orderItemBeanPriceTotal(
-				orderItemBeanList);
+		int subtotal = PriceCalc.orderItemBeanPriceTotal(orderItemBeanList);
 
 		int discountAmount = 0;
 		String couponName = null;
@@ -370,9 +354,7 @@ public class OrderRegistController {
 
 			if (selectedCoupon.isEmpty()) {
 
-				model.addAttribute(
-						"couponError",
-						"選択したクーポンは利用できません。");
+				model.addAttribute("couponError", "選択したクーポンは利用できません。");
 
 				return inputPaymentBack(model, form);
 			}
@@ -391,27 +373,22 @@ public class OrderRegistController {
 
 		int total = subtotal - discountAmount;
 
-		model.addAttribute(
-				"orderItemBeans", orderItemBeanList);
+		model.addAttribute("orderItemBeans", orderItemBeanList);
 
 		model.addAttribute("subtotal", subtotal);
-		model.addAttribute(
-				"discountAmount", discountAmount);
+		model.addAttribute("discountAmount", discountAmount);
 		session.setAttribute("discountAmount", discountAmount);
 
 		model.addAttribute("couponName", couponName);
 		model.addAttribute("total", total);
 		model.addAttribute("orderForm", form);
 
-		model.addAttribute(
-				"itemNameListLessThan",
-				itemNameListLessThan);
+		model.addAttribute("itemNameListLessThan", itemNameListLessThan);
 
-		model.addAttribute(
-				"itemNameListZero",
-				itemNameListZero);
+		model.addAttribute("itemNameListZero", itemNameListZero);
 
 		if (basketBeanList.isEmpty()) {
+			
 			session.removeAttribute("basketBeans");
 		}
 
@@ -427,6 +404,7 @@ public class OrderRegistController {
 			@ModelAttribute OrderForm form) {
 
 		if (getLoginUserId() == null) {
+			
 			return "redirect:/login";
 		}
 
@@ -451,6 +429,7 @@ public class OrderRegistController {
 		Integer userId = getLoginUserId();
 
 		if (userId == null) {
+			
 			return "redirect:/login";
 		}
 
@@ -459,6 +438,7 @@ public class OrderRegistController {
 
 		if (basketBeanList == null
 				|| basketBeanList.isEmpty()) {
+			
 			return "redirect:/basket/list/0";
 		}
 
@@ -469,24 +449,22 @@ public class OrderRegistController {
 
 		for (BasketBean basketBean : basketBeanList) {
 
-			Item item = itemRepository
-					.getById(basketBean.getId());
+			Item item = itemRepository.getById(basketBean.getId());
 
 			if (basketBean.getOrderNum() == null
 					|| basketBean.getOrderNum() <= 0
 					|| item.getStock() < basketBean.getOrderNum()) {
+				
 				errorItem = item;
 				break;
 			}
 
-			subtotal += item.getPrice()
-					* basketBean.getOrderNum();
+			subtotal += item.getPrice() * basketBean.getOrderNum();
 		}
 
 		if (errorItem != null) {
 
-			redirectAttributes.addFlashAttribute(
-					"errorItem", errorItem.getName());
+			redirectAttributes.addFlashAttribute("errorItem", errorItem.getName());
 
 			return "redirect:/basket/list/0";
 		}
@@ -537,11 +515,9 @@ public class OrderRegistController {
 		// 在庫数を更新
 		for (BasketBean basketBean : basketBeanList) {
 
-			Item item = itemRepository
-					.getById(basketBean.getId());
+			Item item = itemRepository.getById(basketBean.getId());
 
-			item.setStock(
-					item.getStock() - basketBean.getOrderNum());
+			item.setStock(item.getStock() - basketBean.getOrderNum());
 
 			itemRepository.save(item);
 		}
@@ -566,13 +542,11 @@ public class OrderRegistController {
 		// 注文商品情報を保存
 		for (BasketBean basketBean : basketBeanList) {
 
-			Item item = itemRepository
-					.getById(basketBean.getId());
+			Item item = itemRepository.getById(basketBean.getId());
 
 			OrderItem orderItem = new OrderItem();
 
-			orderItem.setQuantity(
-					basketBean.getOrderNum());
+			orderItem.setQuantity(basketBean.getOrderNum());
 
 			orderItem.setItem(item);
 			orderItem.setOrder(order);
@@ -587,8 +561,7 @@ public class OrderRegistController {
 			selectedUserCoupon.setStatus(1);
 			selectedUserCoupon.setOrder(order);
 
-			userCouponsRepository.save(
-					selectedUserCoupon);
+			userCouponsRepository.save(selectedUserCoupon);
 		}
 
 		// 商品合計5,000円以上で20%クーポンを付与
@@ -610,10 +583,8 @@ public class OrderRegistController {
 		session.removeAttribute("basketBeans");
 
 		model.addAttribute("orderForm", form);
-		model.addAttribute(
-				"discountAmount", discountAmount);
-		model.addAttribute(
-				"total", subtotal - discountAmount);
+		model.addAttribute("discountAmount", discountAmount);
+		model.addAttribute("total", subtotal - discountAmount);
 
 		return "order/regist/order_complete";
 	}

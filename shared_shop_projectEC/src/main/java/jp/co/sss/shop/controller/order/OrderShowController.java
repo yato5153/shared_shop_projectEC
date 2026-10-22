@@ -46,20 +46,15 @@ public class OrderShowController {
      * 注文一覧表示処理
      */
     @RequestMapping(path = "/order/list", method = RequestMethod.GET)
-    public String showOrderList(
-            Model model,
-            @ModelAttribute OrderShowForm form) {
+    public String showOrderList(Model model, @ModelAttribute OrderShowForm form) {
 
-        UserBean userBean =
-                (UserBean) session.getAttribute("user");
+        UserBean userBean = (UserBean) session.getAttribute("user");
 
         if (userBean == null) {
             return "redirect:/login";
         }
 
-        List<Order> orderList =
-                orderRepository.findByUserIdOrderByInsertDateDescIdAsc(
-                        userBean.getId());
+        List<Order> orderList = orderRepository.findByUserIdOrderByInsertDateDescIdAsc(userBean.getId());
 
         List<OrderBean> orderBeanList = new ArrayList<>();
 
@@ -69,15 +64,14 @@ public class OrderShowController {
 
             orderBean.setId(order.getId());
             orderBean.setUserName(order.getUser().getName());
-            orderBean.setInsertDate(
-                    order.getInsertDate().toString());
+            orderBean.setInsertDate(order.getInsertDate().toString());
             orderBean.setPayMethod(order.getPayMethod());
 
             int total = 0;
 
             for (OrderItem orderItem : order.getOrderItemsList()) {
-                total += orderItem.getPrice()
-                        * orderItem.getQuantity();
+            	
+                total += orderItem.getPrice() * orderItem.getQuantity();
             }
 
             //クーポン利用履歴の検索
@@ -86,11 +80,13 @@ public class OrderShowController {
             Integer discountAmount = 0;
             
             if (orderCoupns.isPresent()) {
+            	
             	UserCoupon userCoupon = orderCoupns.get();
             	
             	Coupon couppon = userCoupon.getCoupon();
             	
             	if (couppon != null) {
+            		
             		BigDecimal discountRate = couppon.getDiscountRate();
             		
             		BigDecimal discount = BigDecimal.valueOf(total)
@@ -105,7 +101,8 @@ public class OrderShowController {
 
             orderBeanList.add(orderBean);
         }
-
+        
+        //
         model.addAttribute("orders", orderBeanList);
         model.addAttribute("url", "/order/list");
 
@@ -115,26 +112,18 @@ public class OrderShowController {
     /**
      * 注文詳細表示処理
      */
-    @RequestMapping(
-            path = "/order/detail/{id}",
-            method = RequestMethod.GET)
-    public String showOrder(
-            @PathVariable int id,
-            Model model,
-            @ModelAttribute OrderShowForm form) {
+    @RequestMapping(path = "/order/detail/{id}", method = RequestMethod.GET)
+    public String showOrder(@PathVariable int id, Model model, @ModelAttribute OrderShowForm form) {
 
         // ログイン会員情報
-        UserBean userBean =
-                (UserBean) session.getAttribute("user");
+        UserBean userBean = (UserBean) session.getAttribute("user");
 
         if (userBean == null) {
             return "redirect:/login";
         }
 
         // 本人の注文だけ取得
-        Optional<Order> optionalOrder =
-                orderRepository.findByIdAndUserId(
-                        id, userBean.getId());
+        Optional<Order> optionalOrder =orderRepository.findByIdAndUserId(id, userBean.getId());
 
         if (optionalOrder.isEmpty()) {
             return "redirect:/order/list";
@@ -146,30 +135,22 @@ public class OrderShowController {
         OrderBean orderBean = new OrderBean();
         BeanUtils.copyProperties(order, orderBean);
 
-        orderBean.setInsertDate(
-                order.getInsertDate().toString());
+        orderBean.setInsertDate(order.getInsertDate().toString());
 
         // 注文商品情報
-        List<OrderItemBean> orderItemBeanList =
-                new ArrayList<>();
+        List<OrderItemBean> orderItemBeanList = new ArrayList<>();
 
         for (OrderItem orderItem : order.getOrderItemsList()) {
 
-            OrderItemBean orderItemBean =
-                    new OrderItemBean();
+            OrderItemBean orderItemBean = new OrderItemBean();
 
-            orderItemBean.setName(
-                    orderItem.getItem().getName());
+            orderItemBean.setName(orderItem.getItem().getName());
 
-            orderItemBean.setPrice(
-                    orderItem.getPrice());
+            orderItemBean.setPrice(orderItem.getPrice());
 
-            orderItemBean.setOrderNum(
-                    orderItem.getQuantity());
+            orderItemBean.setOrderNum(orderItem.getQuantity());
 
-            int subtotal =
-                    orderItem.getPrice()
-                    * orderItem.getQuantity();
+            int subtotal = orderItem.getPrice() * orderItem.getQuantity();
 
             orderItemBean.setSubtotal(subtotal);
 
@@ -185,11 +166,14 @@ public class OrderShowController {
         Integer discountAmount = 0;
         
         if (orderCoupns.isPresent()) {
+        	
         	UserCoupon userCoupon = orderCoupns.get();
         	
         	Coupon couppon = userCoupon.getCoupon();
         	
+        	//クーポン利用記録がある場合割引した値段の計算
         	if (couppon != null) {
+        		
         		BigDecimal discountRate = couppon.getDiscountRate();
         		
         		BigDecimal discount = BigDecimal.valueOf(subtotal)

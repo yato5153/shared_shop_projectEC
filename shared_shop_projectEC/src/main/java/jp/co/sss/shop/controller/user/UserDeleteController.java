@@ -16,9 +16,7 @@ import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
 
 /**
- * 会員管理 削除機能(運用管理者、システム管理者)のコントローラクラス
- *
- * @author SystemShared
+ * 会員管理 削除機能(一般会員)のコントローラクラス
  */
 @Controller
 public class UserDeleteController {
@@ -57,7 +55,7 @@ public class UserDeleteController {
 	 * 会員情報削除完了処理
 	 *
 	 * @param form 会員情報フォーム
-	 * @return "user/delete/user_delete_complete_admin" 会員情報 削除完了画面へ
+	 * @return "user/delete/delete_complete" 会員情報 削除完了画面へ
 	 */
 	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.POST)
 	public String deleteCustomerComplete(@ModelAttribute UserForm form) {
@@ -78,7 +76,7 @@ public class UserDeleteController {
 	 * 会員情報削除完了処理
 	 *
 	 * @param form 会員情報フォーム
-	 * @return "user/delete/user_delete_complete_admin" 会員情報 削除完了画面へ
+	 * @return "user/delete/delete_complete" 会員情報 削除完了画面へ
 	 */
 	@RequestMapping(path = "/user/delete/complete", method = RequestMethod.GET)
 	public String deleteCustomerCompleteRedirect() {
