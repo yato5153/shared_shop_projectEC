@@ -45,614 +45,576 @@ import jp.co.sss.shop.util.PriceCalc;
 @Controller
 public class OrderRegistController {
 
-    @Autowired
-    UserRepository userRpository;
-
-    @Autowired
-    ItemRepository itemRepository;
-
-    @Autowired
-    OrderRepository orderRepository;
+	@Autowired
+	UserRepository userRpository;
 
-    @Autowired
-    OrderItemRepository orderItemRepository;
-
-    @Autowired
-    UserCouponsRepository userCouponsRepository;
-    
-    @Autowired
-    CouponsRepository couponsRepository;
+	@Autowired
+	ItemRepository itemRepository;
 
+	@Autowired
+	OrderRepository orderRepository;
 
-    @Autowired
-    HttpSession session;
+	@Autowired
+	OrderItemRepository orderItemRepository;
 
-    /**
-     * ログイン会員IDを取得
-     */
-    private Integer getLoginUserId() {
-        UserBean userBean =
-                (UserBean) session.getAttribute("user");
+	@Autowired
+	UserCouponsRepository userCouponsRepository;
 
-        if (userBean == null) {
-            return null;
-        }
+	@Autowired
+	CouponsRepository couponsRepository;
 
-        return userBean.getId();
-    }
+	@Autowired
+	HttpSession session;
 
-    /**
-     * 利用可能なクーポン一覧を画面に渡す
-     */
-    private void addAvailableCoupons(Model model) {
+	/**
+	 * ログイン会員IDを取得
+	 */
+	private Integer getLoginUserId() {
+		UserBean userBean = (UserBean) session.getAttribute("user");
 
-        Integer userId = getLoginUserId();
+		if (userBean == null) {
+			return null;
+		}
 
-        if (userId == null) {
-            model.addAttribute(
-                    "availableCoupons",
-                    new ArrayList<UserCoupon>());
-            return;
-        }
+		return userBean.getId();
+	}
 
-        List<UserCoupon> coupons = userCouponsRepository.findByUser_IdAndStatus(userId, 0);
+	/**
+	 * 利用可能なクーポン一覧を画面に渡す
+	 */
+	private void addAvailableCoupons(Model model) {
 
-        model.addAttribute("availableCoupons", coupons);
-    }
+		Integer userId = getLoginUserId();
 
+		if (userId == null) {
+			model.addAttribute(
+					"availableCoupons",
+					new ArrayList<UserCoupon>());
+			return;
+		}
 
-/**
- * 選択クーポンの使用可否を確認
- */
+		List<UserCoupon> coupons = userCouponsRepository.findByUser_IdAndStatus(userId, 0);
 
-private Optional<UserCoupon> findValidCoupon(
-        Integer userCouponId,
-        Integer userId,
-        int subtotal) {
+		model.addAttribute("availableCoupons", coupons);
+	}
 
-    if (userCouponId == null || userId == null || subtotal <= 0) {
-        return Optional.empty();
-    }
+	/**
+	 * 選択クーポンの使用可否を確認
+	 */
 
-    Optional<UserCoupon> result =
-            userCouponsRepository.findByIdAndUser_IdAndStatus(
-                    userCouponId, userId, 0);
+	private Optional<UserCoupon> findValidCoupon(
+			Integer userCouponId,
+			Integer userId,
+			int subtotal) {
 
-    if (result.isEmpty()) {
-        return Optional.empty();
-    }
+		if (userCouponId == null || userId == null || subtotal <= 0) {
+			return Optional.empty();
+		}
 
-    UserCoupon userCoupon = result.get();
+		Optional<UserCoupon> result = userCouponsRepository.findByIdAndUser_IdAndStatus(
+				userCouponId, userId, 0);
 
-    java.math.BigDecimal discountRate =
-            userCoupon.getCoupon().getDiscountRate();
+		if (result.isEmpty()) {
+			return Optional.empty();
+		}
 
-    if (discountRate == null
-            || discountRate.compareTo(java.math.BigDecimal.ZERO) <= 0
-            || discountRate.compareTo(new java.math.BigDecimal("100")) > 0) {
-        return Optional.empty();
-    }
+		UserCoupon userCoupon = result.get();
 
-    return Optional.of(userCoupon);
-}
+		java.math.BigDecimal discountRate = userCoupon.getCoupon().getDiscountRate();
 
-    /**
-     * お届け先入力処理
-     */
-    @RequestMapping(
-            path = "/address/input",
-            method = RequestMethod.POST)
-    public String inputAddress(
-            boolean backFlg,
-            String postalCode,
-            String address,
-            String name,
-            String phoneNumber,
-            Model model,
-            @ModelAttribute BasketForm form) {
+		if (discountRate == null
+				|| discountRate.compareTo(java.math.BigDecimal.ZERO) <= 0
+				|| discountRate.compareTo(new java.math.BigDecimal("100")) > 0) {
+			return Optional.empty();
+		}
 
-        Integer userId = getLoginUserId();
+		return Optional.of(userCoupon);
+	}
 
-        if (userId == null) {
-            return "redirect:/login";
-        }
+	/**
+	 * お届け先入力処理
+	 */
+	@RequestMapping(path = "/address/input", method = RequestMethod.POST)
+	public String inputAddress(
+			boolean backFlg,
+			String postalCode,
+			String address,
+			String name,
+			String phoneNumber,
+			Model model,
+			@ModelAttribute BasketForm form) {
 
-        if (form.getItemId() != null) {
+		Integer userId = getLoginUserId();
 
-            List<BasketBean> basketBeanList =
-                    new ArrayList<>();
+		if (userId == null) {
+			return "redirect:/login";
+		}
 
-            for (int i = 0; i < form.getItemId().length; i++) {
+		if (form.getItemId() != null) {
 
-                Item item = itemRepository
-                        .getById(form.getItemId()[i]);
+			List<BasketBean> basketBeanList = new ArrayList<>();
 
-                BasketBean basketBean = new BasketBean(
-                        item.getId(),
-                        item.getName(),
-                        item.getStock(),
-                        form.getOrderNum()[i]);
+			for (int i = 0; i < form.getItemId().length; i++) {
 
-                basketBeanList.add(basketBean);
-            }
+				Item item = itemRepository
+						.getById(form.getItemId()[i]);
 
-            session.setAttribute(
-                    "basketBeans", basketBeanList);
-        }
+				BasketBean basketBean = new BasketBean(
+						item.getId(),
+						item.getName(),
+						item.getStock(),
+						form.getOrderNum()[i]);
 
-        AddressForm addressForm = new AddressForm();
+				basketBeanList.add(basketBean);
+			}
 
-        if (backFlg) {
+			session.setAttribute(
+					"basketBeans", basketBeanList);
+		}
 
-            addressForm.setPostalCode(postalCode);
-            addressForm.setAddress(address);
-            addressForm.setName(name);
-            addressForm.setPhoneNumber(phoneNumber);
+		AddressForm addressForm = new AddressForm();
 
-        } else {
+		if (backFlg) {
 
-            User user = userRpository.getById(userId);
+			addressForm.setPostalCode(postalCode);
+			addressForm.setAddress(address);
+			addressForm.setName(name);
+			addressForm.setPhoneNumber(phoneNumber);
 
-            BeanUtils.copyProperties(user, addressForm);
-        }
+		} else {
 
-        model.addAttribute("addressForm", addressForm);
+			User user = userRpository.getById(userId);
 
-        return "order/regist/order_address_input";
-    }
+			BeanUtils.copyProperties(user, addressForm);
+		}
 
-    /**
-     * お届け先入力エラー時
-     */
-    @RequestMapping(
-            path = "/address/input",
-            method = RequestMethod.GET)
-    public String inputAddressError() {
+		model.addAttribute("addressForm", addressForm);
 
-        return "order/regist/order_address_input";
-    }
+		return "order/regist/order_address_input";
+	}
 
-    /**
-     * 支払い方法・クーポン選択画面
-     */
-    @RequestMapping(
-            path = "/payment/input",
-            method = RequestMethod.POST)
-    public String inputPayment(
-            boolean backFlg,
-            Integer payMethod,
-            Model model,
-            @Valid @ModelAttribute AddressForm form,
-            BindingResult result,
-            RedirectAttributes redirectAttributes) {
+	/**
+	 * お届け先入力エラー時
+	 */
+	@RequestMapping(path = "/address/input", method = RequestMethod.GET)
+	public String inputAddressError() {
 
-        if (getLoginUserId() == null) {
-            return "redirect:/login";
-        }
+		return "order/regist/order_address_input";
+	}
 
-        if (result.hasErrors()) {
+	/**
+	 * 支払い方法・クーポン選択画面
+	 */
+	@RequestMapping(path = "/payment/input", method = RequestMethod.POST)
+	public String inputPayment(
+			boolean backFlg,
+			Integer payMethod,
+			Model model,
+			@Valid @ModelAttribute AddressForm form,
+			BindingResult result,
+			RedirectAttributes redirectAttributes) {
 
-            redirectAttributes.addFlashAttribute(
-                    "org.springframework.validation.BindingResult.addressForm",
-                    result);
+		if (getLoginUserId() == null) {
+			return "redirect:/login";
+		}
 
-            redirectAttributes.addFlashAttribute(
-                    "addressForm", form);
+		if (result.hasErrors()) {
 
-            return "redirect:/address/input";
-        }
+			redirectAttributes.addFlashAttribute(
+					"org.springframework.validation.BindingResult.addressForm",
+					result);
 
-        OrderForm orderForm = new OrderForm();
+			redirectAttributes.addFlashAttribute(
+					"addressForm", form);
 
-        BeanUtils.copyProperties(form, orderForm);
+			return "redirect:/address/input";
+		}
 
-        if (backFlg) {
-            orderForm.setPayMethod(payMethod);
-        }
+		OrderForm orderForm = new OrderForm();
 
-        Integer userId = getLoginUserId();
+		BeanUtils.copyProperties(form, orderForm);
 
-        User user = userRpository.getById(userId);
+		if (backFlg) {
+			orderForm.setPayMethod(payMethod);
+		}
 
-        BeanUtils.copyProperties(user, orderForm);
-        BeanUtils.copyProperties(form, orderForm);
+		Integer userId = getLoginUserId();
 
-        model.addAttribute("orderForm", orderForm);
+		User user = userRpository.getById(userId);
 
-        // 利用可能クーポン一覧を取得
-        addAvailableCoupons(model);
+		BeanUtils.copyProperties(user, orderForm);
+		BeanUtils.copyProperties(form, orderForm);
 
-        return "order/regist/order_payment_input";
-    }
+		model.addAttribute("orderForm", orderForm);
 
-    /**
-     * 注文内容確認処理
-     */
-    @RequestMapping(
-            path = "/order/check",
-            method = RequestMethod.POST)
-    public String checkOrder(
-            Model model,
-            @Valid @ModelAttribute OrderForm form,
-            BindingResult result) {
+		// 利用可能クーポン一覧を取得
+		addAvailableCoupons(model);
 
-        Integer userId = getLoginUserId();
+		return "order/regist/order_payment_input";
+	}
 
-        if (userId == null) {
-            return "redirect:/login";
-        }
+	/**
+	 * 注文内容確認処理
+	 */
+	@RequestMapping(path = "/order/check", method = RequestMethod.POST)
+	public String checkOrder(
+			Model model,
+			@Valid @ModelAttribute OrderForm form,
+			BindingResult result) {
 
-        if (form.getPayMethod() == null
-                || result.hasErrors()) {
+		Integer userId = getLoginUserId();
 
-            return inputPaymentBack(model, form);
-        }
+		if (userId == null) {
+			return "redirect:/login";
+		}
 
-        @SuppressWarnings("unchecked")
-        List<BasketBean> basketBeanList =
-                (List<BasketBean>)
-                session.getAttribute("basketBeans");
+		if (form.getPayMethod() == null
+				|| result.hasErrors()) {
 
-        if (basketBeanList == null
-                || basketBeanList.isEmpty()) {
-            return "redirect:/basket/list/0";
-        }
+			return inputPaymentBack(model, form);
+		}
 
-        List<OrderItemBean> orderItemBeanList =
-                new ArrayList<>();
+		@SuppressWarnings("unchecked")
+		List<BasketBean> basketBeanList = (List<BasketBean>) session.getAttribute("basketBeans");
 
-        List<String> itemNameListLessThan =
-                new ArrayList<>();
+		if (basketBeanList == null
+				|| basketBeanList.isEmpty()) {
+			return "redirect:/basket/list/0";
+		}
 
-        List<String> itemNameListZero =
-                new ArrayList<>();
+		List<OrderItemBean> orderItemBeanList = new ArrayList<>();
 
-        List<BasketBean> itemListZero =
-                new ArrayList<>();
+		List<String> itemNameListLessThan = new ArrayList<>();
 
-        // 在庫数の確認
-        for (BasketBean basketBean : basketBeanList) {
-        	
-        	if (basketBean.getOrderNum() == null
-        	        || basketBean.getOrderNum() <= 0) {
+		List<String> itemNameListZero = new ArrayList<>();
 
-        	    model.addAttribute(
-        	            "quantityError",
-        	            "注文数量は1以上を指定してください。");
+		List<BasketBean> itemListZero = new ArrayList<>();
 
-        	    return inputPaymentBack(model, form);
-        	}
+		// 在庫数の確認
+		for (BasketBean basketBean : basketBeanList) {
 
-            Item itemStockLessThanOrderNum =
-                    itemRepository.findByIdAndStockLessThan(
-                            basketBean.getId(),
-                            basketBean.getOrderNum());
+			if (basketBean.getOrderNum() == null
+					|| basketBean.getOrderNum() <= 0) {
 
-            if (itemStockLessThanOrderNum != null) {
+				model.addAttribute(
+						"quantityError",
+						"注文数量は1以上を指定してください。");
 
-                if (itemStockLessThanOrderNum.getStock() > 0) {
+				return inputPaymentBack(model, form);
+			}
 
-                    itemNameListLessThan.add(
-                            itemStockLessThanOrderNum.getName());
+			Item itemStockLessThanOrderNum = itemRepository.findByIdAndStockLessThan(
+					basketBean.getId(),
+					basketBean.getOrderNum());
 
-                    basketBean.setOrderNum(
-                            itemStockLessThanOrderNum.getStock());
+			if (itemStockLessThanOrderNum != null) {
 
-                    basketBean.setStock(
-                            itemStockLessThanOrderNum.getStock());
+				if (itemStockLessThanOrderNum.getStock() > 0) {
 
-                } else {
+					itemNameListLessThan.add(
+							itemStockLessThanOrderNum.getName());
 
-                    itemNameListZero.add(
-                            basketBean.getName());
+					basketBean.setOrderNum(
+							itemStockLessThanOrderNum.getStock());
 
-                    itemListZero.add(basketBean);
-                }
-            }
-        }
+					basketBean.setStock(
+							itemStockLessThanOrderNum.getStock());
 
-        for (BasketBean itemZero : itemListZero) {
-            basketBeanList.remove(itemZero);
-        }
+				} else {
 
-        // 注文商品情報を生成
-        for (BasketBean basketBean : basketBeanList) {
+					itemNameListZero.add(
+							basketBean.getName());
 
-            Item item = itemRepository
-                    .getById(basketBean.getId());
+					itemListZero.add(basketBean);
+				}
+			}
+		}
 
-            OrderItemBean orderItemBean =
-                    new OrderItemBean();
+		for (BasketBean itemZero : itemListZero) {
+			basketBeanList.remove(itemZero);
+		}
 
-            BeanUtils.copyProperties(item, orderItemBean);
+		// 注文商品情報を生成
+		for (BasketBean basketBean : basketBeanList) {
 
-            orderItemBean.setOrderNum(
-                    basketBean.getOrderNum());
+			Item item = itemRepository
+					.getById(basketBean.getId());
 
-            int subtotal =
-                    item.getPrice() * basketBean.getOrderNum();
+			OrderItemBean orderItemBean = new OrderItemBean();
 
-            orderItemBean.setSubtotal(subtotal);
+			BeanUtils.copyProperties(item, orderItemBean);
 
-            orderItemBeanList.add(orderItemBean);
-        }
+			orderItemBean.setOrderNum(
+					basketBean.getOrderNum());
 
-        int subtotal =
-                PriceCalc.orderItemBeanPriceTotal(
-                        orderItemBeanList);
+			int subtotal = item.getPrice() * basketBean.getOrderNum();
 
-        int discountAmount = 0;
-        String couponName = null;
+			orderItemBean.setSubtotal(subtotal);
 
-        // 選択したクーポンを確認
-        if (form.getUserCouponId() != null) {
+			orderItemBeanList.add(orderItemBean);
+		}
 
-            Optional<UserCoupon> selectedCoupon =
-                    findValidCoupon(
-                            form.getUserCouponId(),
-                            userId,
-                            subtotal);
+		int subtotal = PriceCalc.orderItemBeanPriceTotal(
+				orderItemBeanList);
 
-            if (selectedCoupon.isEmpty()) {
+		int discountAmount = 0;
+		String couponName = null;
 
-                model.addAttribute(
-                        "couponError",
-                        "選択したクーポンは利用できません。");
+		// 選択したクーポンを確認
+		if (form.getUserCouponId() != null) {
 
-                return inputPaymentBack(model, form);
-            }
+			Optional<UserCoupon> selectedCoupon = findValidCoupon(
+					form.getUserCouponId(),
+					userId,
+					subtotal);
 
-            UserCoupon userCoupon = selectedCoupon.get();
+			if (selectedCoupon.isEmpty()) {
 
+				model.addAttribute(
+						"couponError",
+						"選択したクーポンは利用できません。");
 
-discountAmount = java.math.BigDecimal.valueOf(subtotal)
-        .multiply(userCoupon.getCoupon().getDiscountRate())
-        .divide(new java.math.BigDecimal("100"))
-        .setScale(0, java.math.RoundingMode.DOWN)
-        .intValue();
+				return inputPaymentBack(model, form);
+			}
 
-couponName = userCoupon.getCoupon().getCouponsName();
+			UserCoupon userCoupon = selectedCoupon.get();
 
-        }
+			discountAmount = java.math.BigDecimal.valueOf(subtotal)
+					.multiply(userCoupon.getCoupon().getDiscountRate())
+					.divide(new java.math.BigDecimal("100"))
+					.setScale(0, java.math.RoundingMode.DOWN)
+					.intValue();
 
-        int total = subtotal - discountAmount;
+			couponName = userCoupon.getCoupon().getCouponsName();
 
-        model.addAttribute(
-                "orderItemBeans", orderItemBeanList);
+		}
 
-        model.addAttribute("subtotal", subtotal);
-        model.addAttribute(
-                "discountAmount", discountAmount);
-        session.setAttribute("discountAmount", discountAmount);
-        
-        model.addAttribute("couponName", couponName);
-        model.addAttribute("total", total);
-        model.addAttribute("orderForm", form);
+		int total = subtotal - discountAmount;
 
-        model.addAttribute(
-                "itemNameListLessThan",
-                itemNameListLessThan);
+		model.addAttribute(
+				"orderItemBeans", orderItemBeanList);
 
-        model.addAttribute(
-                "itemNameListZero",
-                itemNameListZero);
+		model.addAttribute("subtotal", subtotal);
+		model.addAttribute(
+				"discountAmount", discountAmount);
+		session.setAttribute("discountAmount", discountAmount);
 
-        if (basketBeanList.isEmpty()) {
-            session.removeAttribute("basketBeans");
-        }
+		model.addAttribute("couponName", couponName);
+		model.addAttribute("total", total);
+		model.addAttribute("orderForm", form);
 
-        return "order/regist/order_check";
-    }
+		model.addAttribute(
+				"itemNameListLessThan",
+				itemNameListLessThan);
 
-    /**
-     * 支払い方法選択画面への戻る処理
-     */
-    @RequestMapping(
-            path = "/payment/input/back",
-            method = RequestMethod.POST)
-    public String inputPaymentBack(
-            Model model,
-            @ModelAttribute OrderForm form) {
+		model.addAttribute(
+				"itemNameListZero",
+				itemNameListZero);
 
-        if (getLoginUserId() == null) {
-            return "redirect:/login";
-        }
+		if (basketBeanList.isEmpty()) {
+			session.removeAttribute("basketBeans");
+		}
 
-        model.addAttribute("orderForm", form);
+		return "order/regist/order_check";
+	}
 
-        // 戻った際もクーポン一覧を表示
-        addAvailableCoupons(model);
+	/**
+	 * 支払い方法選択画面への戻る処理
+	 */
+	@RequestMapping(path = "/payment/input/back", method = RequestMethod.POST)
+	public String inputPaymentBack(
+			Model model,
+			@ModelAttribute OrderForm form) {
 
-        return "order/regist/order_payment_input";
-    }
+		if (getLoginUserId() == null) {
+			return "redirect:/login";
+		}
 
-    /**
-     * 注文確定処理
-     */
-    @Transactional
-    @RequestMapping(
-            path = "/order/complete",
-            method = RequestMethod.POST)
-    public String completeOrder(
-            Model model,
-            @ModelAttribute OrderForm form,
-            RedirectAttributes redirectAttributes) {
+		model.addAttribute("orderForm", form);
 
-        Integer userId = getLoginUserId();
+		// 戻った際もクーポン一覧を表示
+		addAvailableCoupons(model);
 
-        if (userId == null) {
-            return "redirect:/login";
-        }
+		return "order/regist/order_payment_input";
+	}
 
-        @SuppressWarnings("unchecked")
-        List<BasketBean> basketBeanList =
-                (List<BasketBean>)
-                session.getAttribute("basketBeans");
+	/**
+	 * 注文確定処理
+	 */
+	@Transactional
+	@RequestMapping(path = "/order/complete", method = RequestMethod.POST)
+	public String completeOrder(
+			Model model,
+			@ModelAttribute OrderForm form,
+			RedirectAttributes redirectAttributes) {
 
-        if (basketBeanList == null
-                || basketBeanList.isEmpty()) {
-            return "redirect:/basket/list/0";
-        }
+		Integer userId = getLoginUserId();
 
-        // 注文確定時に在庫を再確認
-        Item errorItem = null;
+		if (userId == null) {
+			return "redirect:/login";
+		}
 
-        int subtotal = 0;
+		@SuppressWarnings("unchecked")
+		List<BasketBean> basketBeanList = (List<BasketBean>) session.getAttribute("basketBeans");
 
-        for (BasketBean basketBean : basketBeanList) {
+		if (basketBeanList == null
+				|| basketBeanList.isEmpty()) {
+			return "redirect:/basket/list/0";
+		}
 
-            Item item = itemRepository
-                    .getById(basketBean.getId());
+		// 注文確定時に在庫を再確認
+		Item errorItem = null;
 
-            if (basketBean.getOrderNum() == null
-                    || basketBean.getOrderNum() <= 0
-                    || item.getStock() < basketBean.getOrderNum()) {
-                errorItem = item;
-                break;
-            }
+		int subtotal = 0;
 
-            subtotal += item.getPrice()
-                    * basketBean.getOrderNum();
-        }
+		for (BasketBean basketBean : basketBeanList) {
 
-        if (errorItem != null) {
+			Item item = itemRepository
+					.getById(basketBean.getId());
 
-            redirectAttributes.addFlashAttribute(
-                    "errorItem", errorItem.getName());
+			if (basketBean.getOrderNum() == null
+					|| basketBean.getOrderNum() <= 0
+					|| item.getStock() < basketBean.getOrderNum()) {
+				errorItem = item;
+				break;
+			}
 
-            return "redirect:/basket/list/0";
-        }
+			subtotal += item.getPrice()
+					* basketBean.getOrderNum();
+		}
 
-        int discountAmount = 0;
-        UserCoupon selectedUserCoupon = null;
+		if (errorItem != null) {
 
-        // クーポンの再確認
-        if (form.getUserCouponId() != null) {
+			redirectAttributes.addFlashAttribute(
+					"errorItem", errorItem.getName());
 
-        	Optional<UserCoupon> couponResult =
-        	        userCouponsRepository.findUnusedCouponForUpdate(
-        	                form.getUserCouponId(),
-        	                userId);
+			return "redirect:/basket/list/0";
+		}
 
-            if (couponResult.isEmpty()) {
+		int discountAmount = 0;
+		UserCoupon selectedUserCoupon = null;
 
-                redirectAttributes.addFlashAttribute(
-                        "couponError",
-                        "クーポンを利用できません。"
-                        + "もう一度選択してください。");
+		// クーポンの再確認
+		if (form.getUserCouponId() != null) {
 
-                return "redirect:/basket/list/0";
-            }
+			Optional<UserCoupon> couponResult = userCouponsRepository.findUnusedCouponForUpdate(
+					form.getUserCouponId(),
+					userId);
 
-            selectedUserCoupon = couponResult.get();
-            java.math.BigDecimal discountRate =
-                    selectedUserCoupon.getCoupon().getDiscountRate();
+			if (couponResult.isEmpty()) {
 
-            if (subtotal <= 0
-                    || discountRate == null
-                    || discountRate.compareTo(java.math.BigDecimal.ZERO) <= 0
-                    || discountRate.compareTo(new java.math.BigDecimal("100")) > 0) {
+				redirectAttributes.addFlashAttribute(
+						"couponError",
+						"クーポンを利用できません。"
+								+ "もう一度選択してください。");
 
-                redirectAttributes.addFlashAttribute(
-                        "couponError",
-                        "クーポンを利用できません。もう一度選択してください。");
+				return "redirect:/basket/list/0";
+			}
 
-                return "redirect:/basket/list/0";
-            }
+			selectedUserCoupon = couponResult.get();
+			java.math.BigDecimal discountRate = selectedUserCoupon.getCoupon().getDiscountRate();
 
+			if (subtotal <= 0
+					|| discountRate == null
+					|| discountRate.compareTo(java.math.BigDecimal.ZERO) <= 0
+					|| discountRate.compareTo(new java.math.BigDecimal("100")) > 0) {
 
-discountAmount = java.math.BigDecimal.valueOf(subtotal)
-        .multiply(selectedUserCoupon.getCoupon().getDiscountRate())
-        .divide(new java.math.BigDecimal("100"))
-        .setScale(0, java.math.RoundingMode.DOWN)
-        .intValue();
+				redirectAttributes.addFlashAttribute(
+						"couponError",
+						"クーポンを利用できません。もう一度選択してください。");
 
-        }
+				return "redirect:/basket/list/0";
+			}
 
-        // 在庫数を更新
-        for (BasketBean basketBean : basketBeanList) {
+			discountAmount = java.math.BigDecimal.valueOf(subtotal)
+					.multiply(selectedUserCoupon.getCoupon().getDiscountRate())
+					.divide(new java.math.BigDecimal("100"))
+					.setScale(0, java.math.RoundingMode.DOWN)
+					.intValue();
 
-            Item item = itemRepository
-                    .getById(basketBean.getId());
+		}
 
-            item.setStock(
-                    item.getStock() - basketBean.getOrderNum());
+		// 在庫数を更新
+		for (BasketBean basketBean : basketBeanList) {
 
-            itemRepository.save(item);
-        }
+			Item item = itemRepository
+					.getById(basketBean.getId());
 
-        // 注文情報を保存
-        Order order = new Order();
+			item.setStock(
+					item.getStock() - basketBean.getOrderNum());
 
-        order.setPostalCode(form.getPostalCode());
-        order.setAddress(form.getAddress());
-        order.setName(form.getName());
-        order.setPhoneNumber(form.getPhoneNumber());
-        order.setPayMethod(form.getPayMethod());
-        //order.setDiscountAmount(discountAmount);
+			itemRepository.save(item);
+		}
 
-        User user = userRpository.getById(userId);
+		// 注文情報を保存
+		Order order = new Order();
 
-        order.setUser(user);
+		order.setPostalCode(form.getPostalCode());
+		order.setAddress(form.getAddress());
+		order.setName(form.getName());
+		order.setPhoneNumber(form.getPhoneNumber());
+		order.setPayMethod(form.getPayMethod());
+		//order.setDiscountAmount(discountAmount);
 
-        // 保存した注文をそのまま使用する
-        order = orderRepository.save(order);
+		User user = userRpository.getById(userId);
 
-        // 注文商品情報を保存
-        for (BasketBean basketBean : basketBeanList) {
+		order.setUser(user);
 
-            Item item = itemRepository
-                    .getById(basketBean.getId());
+		// 保存した注文をそのまま使用する
+		order = orderRepository.save(order);
 
-            OrderItem orderItem = new OrderItem();
+		// 注文商品情報を保存
+		for (BasketBean basketBean : basketBeanList) {
 
-            orderItem.setQuantity(
-                    basketBean.getOrderNum());
+			Item item = itemRepository
+					.getById(basketBean.getId());
 
-            orderItem.setItem(item);
-            orderItem.setOrder(order);
-            orderItem.setPrice(item.getPrice());
+			OrderItem orderItem = new OrderItem();
 
-            orderItemRepository.save(orderItem);
-        }
+			orderItem.setQuantity(
+					basketBean.getOrderNum());
 
-        // クーポンを使用済みに変更
-        if (selectedUserCoupon != null) {
+			orderItem.setItem(item);
+			orderItem.setOrder(order);
+			orderItem.setPrice(item.getPrice());
 
-       	selectedUserCoupon.setStatus(1);
-            selectedUserCoupon.setOrder(order);
+			orderItemRepository.save(orderItem);
+		}
 
-           userCouponsRepository.save(
-                   selectedUserCoupon);
-         }
-        
+		// クーポンを使用済みに変更
+		if (selectedUserCoupon != null) {
 
-        // 商品合計5,000円以上で20%クーポンを付与
-        if (subtotal >= 5000) {
+			selectedUserCoupon.setStatus(1);
+			selectedUserCoupon.setOrder(order);
 
-            Coupon repeatCoupon = couponsRepository.findById(7)
-                    .orElseThrow(() ->
-                            new IllegalStateException(
-                                    "リピート会員クーポンが見つかりません。"));
+			userCouponsRepository.save(
+					selectedUserCoupon);
+		}
 
-            UserCoupon newUserCoupon = new UserCoupon();
-            newUserCoupon.setUser(user);
-            newUserCoupon.setCoupon(repeatCoupon);
-            newUserCoupon.setStatus(0);
+		// 商品合計5,000円以上で20%クーポンを付与
+		if (subtotal >= 5000) {
 
-            userCouponsRepository.save(newUserCoupon);
-        }
+			Coupon repeatCoupon = couponsRepository.findById(7)
+					.orElseThrow(() -> new IllegalStateException(
+							"リピート会員クーポンが見つかりません。"));
 
+			UserCoupon newUserCoupon = new UserCoupon();
+			newUserCoupon.setUser(user);
+			newUserCoupon.setCoupon(repeatCoupon);
+			newUserCoupon.setStatus(0);
 
-        // 注文完了後に買い物かごを初期化
-        session.removeAttribute("basketBeans");
+			userCouponsRepository.save(newUserCoupon);
+		}
 
-        model.addAttribute("orderForm", form);
-        model.addAttribute(
-                "discountAmount", discountAmount);
-        model.addAttribute(
-                "total", subtotal - discountAmount);
+		// 注文完了後に買い物かごを初期化
+		session.removeAttribute("basketBeans");
 
-        return "order/regist/order_complete";
-    }
+		model.addAttribute("orderForm", form);
+		model.addAttribute(
+				"discountAmount", discountAmount);
+		model.addAttribute(
+				"total", subtotal - discountAmount);
+
+		return "order/regist/order_complete";
+	}
 }
