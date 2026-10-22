@@ -1,5 +1,6 @@
 package jp.co.sss.shop.controller.order;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +18,10 @@ import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.OrderBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.Coupon;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
+import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderShowForm;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserCouponsRepository;
@@ -77,17 +80,28 @@ public class OrderShowController {
                         * orderItem.getQuantity();
             }
 
-            //変更箇所
-            Integer discountAmount =
-                    (Integer) session.getAttribute("discountAmount");
-
-                model.addAttribute("discountAmount", discountAmount);
-                
-            int discount = discountAmount == null
-                    ? 0 : discountAmount;
-            //ここまで
+            //クーポン利用履歴の検索
+            Optional<UserCoupon> orderCoupns = userCouponsRepository.findByOrder_Id(orderBean.getId());
             
-            orderBean.setTotal(Math.max(0, total - discount));
+            Integer discountAmount = 0;
+            
+            if (orderCoupns.isPresent()) {
+            	UserCoupon userCoupon = orderCoupns.get();
+            	
+            	Coupon couppon = userCoupon.getCoupon();
+            	
+            	if (couppon != null) {
+            		BigDecimal discountRate = couppon.getDiscountRate();
+            		
+            		BigDecimal discount = BigDecimal.valueOf(total)
+            				.multiply(discountRate)
+            				.divide(BigDecimal.valueOf(100));
+            		
+            		discountAmount = discount.intValue();
+            	}
+            }
+            
+            orderBean.setTotal(Math.max(0, total - discountAmount));
 
             orderBeanList.add(orderBean);
         }
@@ -163,38 +177,34 @@ public class OrderShowController {
         }
 
         // 商品合計金額
-        int subtotal =
-                PriceCalc.orderItemPriceTotal(
-                        orderItemBeanList);
-
-        // 注文時点の割引金額
-        //int discountAmount =
-        		//discountAmount == null
-                       //? 0 : discountAmount;
+        int subtotal = PriceCalc.orderItemPriceTotal(orderItemBeanList);
         
-        //変更箇所
-        Integer discountAmount =
-                (Integer) session.getAttribute("discountAmount");
-
-            model.addAttribute("discountAmount", discountAmount);
-            
-        discountAmount = discountAmount == null
-                ? 0 : discountAmount;
-        //ここまで
+        //クーポン利用履歴の検索
+        Optional<UserCoupon> orderCoupns = userCouponsRepository.findByOrder_Id(id);
+        
+        Integer discountAmount = 0;
+        
+        if (orderCoupns.isPresent()) {
+        	UserCoupon userCoupon = orderCoupns.get();
+        	
+        	Coupon couppon = userCoupon.getCoupon();
+        	
+        	if (couppon != null) {
+        		BigDecimal discountRate = couppon.getDiscountRate();
+        		
+        		BigDecimal discount = BigDecimal.valueOf(subtotal)
+        				.multiply(discountRate)
+        				.divide(BigDecimal.valueOf(100));
+        		
+        		discountAmount = discount.intValue();
+        	}
+        }
 
         // クーポン適用後の支払金額
-        int total =
-                Math.max(0, subtotal - discountAmount);
+        int total = Math.max(0, subtotal - discountAmount);
 
         // 使用クーポン情報
         String couponName = null;
-
-//        Optional<UserCoupon> userCoupon =userCouponsRepository.findB(id);
-//
-//        if (userCoupon.isPresent()) {
-//            couponName =
-//                    userCoupon.get().getCoupon().getCouponsName();
-//        }
 
         // HTMLへ渡す情報
         model.addAttribute("order", orderBean);

@@ -43,7 +43,7 @@ public class UserCoupon {
 	private Integer status;
 	
 	/**
-	 * クーポンを使用した注文（これはテーブルにないから作るとエラーになるのでは・gettersetterは未作成）
+	 * クーポンを使用した注文
 	 */
     @OneToOne
     @JoinColumn(name = "order_id")
