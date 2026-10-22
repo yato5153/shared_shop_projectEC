@@ -21,7 +21,7 @@ import jp.co.sss.shop.util.Constant;
  * @author SystemShared
  */
 @Controller
-public class UserDeleteCustomerController {
+public class UserDeleteController {
 
 	/**
 	 * 会員情報

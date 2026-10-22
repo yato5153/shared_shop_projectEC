@@ -22,7 +22,7 @@ import jp.co.sss.shop.util.Constant;
  * @author SystemShared
  */
 @Controller
-public class ItemShowCustomerController {
+public class ItemShowController {
 	/**
 	 * 商品情報
 	 */

@@ -23,7 +23,7 @@ import jp.co.sss.shop.repository.UserCouponsRepository;
 import jp.co.sss.shop.repository.UserRepository;
 
 @Controller
-public class UserRegistCustomerController {
+public class UserRegistController {
 
 
 	// 新規会員登録特典クーポンのID

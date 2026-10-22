@@ -25,7 +25,7 @@ import jp.co.sss.shop.repository.UserRepository;
  * @author SystemShared
  */
 @Controller
-public class UserUpdateCustomerController {
+public class UserUpdateController {
 
 	/**
 	 * 会員情報
